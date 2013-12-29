@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>RTS</title>
+ 
+    <!-- meta -->
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+
+	<script src="lib3/main.js"></script>    
+	<script src="lib3/canvas.js"></script>    
+	<script src="rts.js"></script>
+	<script src="rts_Map.js"></script>
+	<script src="rts_Game.js"></script>
+	<script src="rts_Unit.js"></script>
+	<script src="rts_Build.js"></script>
+	<style>
+	*{
+		font-family:arial;
+		font-size:11px;
+	}
+	#loading{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:800px;
+		height:400px;
+		background:#000000;
+		color:white;
+		text-align:center;
+		padding-top:400px;
+	}
+	#layer_map, #layer_building, #layer_perso, #layer_select, #layer_newbuild, #layer_brouillard,#layer_cadre{
+		position:absolute;
+		top:0px;
+		width:800px;
+		height:400px;
+	}
+	#layer_map{
+		background:url('img3/case-water.png');
+	}
+	#content{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:600px;
+		
+	}
+	#menu{
+		position:absolute;
+		width:800px;
+		top:400px;
+		left:0px;
+		height:20px;
+		background:black;
+		color:white;
+		padding-top:2px;
+		font-family:verdana;
+		font-weight:bold;
+	}
+	#nav{
+		position:absolute;
+		top:420px;
+		left:0px;
+		width:780px;
+		height:184px;
+		background:#222;
+		padding:10px;
+	}
+	#nav h1{
+		color:white;
+		font-size:12px;
+		}
+	#nav h2{
+		color:white;
+		font-size:12px;
+		border-bottom:1px solid white;
+		}
+	#nav2{
+		position:absolute;
+		top:600px;
+		left:0px;
+		width:1200;
+		height:100px;
+		background:#000;
+		text-align:right;
+		
+	}
+	#layer_apercu,#layer_apercuCadre,#layer_apercuBuild,#layer_apercuBrouillard{
+		position:absolute;
+		top:422px;
+		left:600px;
+		border:1px solid white;
+	}
+	#layer_apercu{
+		background:url('img3/case-water.png');
+	}
+	.btnImage{
+		width:20px;
+		padding:4px;
+		background:white;
+		border:3px solid #ccc;
+	}
+	.curseur td{
+		padding:0px;
+		margin:0px;
+	}
+	.curseur input{
+		margin:0px;
+	}
+	 
+	</style>
+	
+	</head>
+	<body onload="preload()">
+
+		<div id="content" onmousemove="oGame.mousemove(event)" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)">
+		<canvas id="layer_map" width="800" height="400"></canvas>
+		<canvas id="layer_building" width="800" height="400"></canvas>
+		<canvas id="layer_perso" width="800" height="400"></canvas>
+		<canvas id="layer_select" width="800" height="400"></canvas>
+		<canvas id="layer_brouillard" width="800" height="400"></canvas>
+		<canvas id="layer_newbuild" width="800" height="400"></canvas>
+		
+		<canvas id="layer_cadre" width="800" height="400"></canvas>
+
+		</div>	
+		<div id="menu">Or: 100 </div>
+		<div id="nav"></div>
+
+		<canvas id="layer_apercu" width="200" height="200"></canvas>
+		<canvas id="layer_apercuBuild" width="200" height="200"></canvas>
+		<canvas id="layer_apercuBrouillard" width="200" height="200"></canvas>
+		<canvas id="layer_apercuCadre" width="200" height="200"></canvas>
+
+		<div id="loading">Loading...</div>
+
+	</body>
+</html>
