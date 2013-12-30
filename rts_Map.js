@@ -108,6 +108,24 @@ Map.prototype={
 		
 		
 	},
+	rebuild:function(){
+		for(var y=0;y< maxY;y++){
+			for(var x=0;x< maxX;x++){
+				
+				var x2=x+currentX;
+				var y2=y+currentY;
+				 
+				if(this.tMap[y2] && this.tMap[y2][x2]){
+					if(this.tMap[y2][x2]==4){
+						this.drawImage( 3 ,x,y);
+					}
+					this.drawImage( this.tMap[y2][x2] ,x,y);
+					
+				}
+			}	
+		} 
+	},
+	
 	buildApercu:function(){
 		var maxMiniY=this.tMap.length;
 		var maxMiniX=this.tMap[0].length;

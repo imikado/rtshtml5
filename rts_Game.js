@@ -47,7 +47,7 @@ Game.prototype={
 		oLayer_cadre.drawRect(0,0,oLayer_map.width,10,'#eeaf17','#eeaf17');
 	},
 	rebuild:function(){
-		map.build();
+		map.rebuild();
 		map.buildApercuCadre();
 		
 		oLayer_building.clear();
@@ -460,7 +460,7 @@ Game.prototype={
 			sHtml+=' Or: '+this.iOr;
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
 			sHtml+='<span style="background:brown;padding:0px 4px">&nbsp;</span>';
-			sHtml+=' Wood: '+this.iWood;
+			sHtml+=' Bois: '+this.iWood;
 			a.innerHTML=sHtml;
 		}
 	},

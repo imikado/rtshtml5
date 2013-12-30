@@ -16,8 +16,6 @@ function Build(name,src){
 	this.tName['or']='Mine d\'or ';
 	this.tName['buid2']='Barrack';
 	
-	
-	
 	this.shortname=this.tName[name];
 	
 	if(this.name=='or'){
@@ -86,7 +84,7 @@ Build.prototype={
 		oGame.displayVisibility();
 	}
 };
-//build creation
+//build creation (pour le choix d'un emplacement où construire un batiment)
 function Buildcreation(name,src){
 	this.name=name;
 	this.src='img3/'+src;
@@ -95,7 +93,6 @@ function Buildcreation(name,src){
 	
 	this.x=0;
 	this.y=0;
-	this.life=100;
 	
 	this.width=80;
 	this.height=80;
@@ -109,7 +106,6 @@ Buildcreation.prototype={
 			this.oImage._y=this.y;
 			this.oImage.onload=this.drawImage;
 		}else{
-			//oLayer_buildingcreation.drawImage(this.oImage ,(this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2);
 			oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'#25db12');
 			
 			if(!oGame.checkCoordVisible(this.x,this.y) || !oGame.checkCoord(this.x,this.y)){
@@ -126,7 +122,6 @@ Buildcreation.prototype={
 			}
 		}
 		 
-		//oGame.saveBuild(this);
 	},
 	drawImage:function(){
 		oLayer_buildingcreation.drawImage(this ,(this._x-currentX)*widthCase,(this._y-currentY)*heightCase);
@@ -139,16 +134,27 @@ Buildcreation.prototype={
 //wood
 function Wood(){
 	this.name='wood';
+	this.shortname='Bois';
+	this.src="img3/case-wood.png";
 	
 	this.x=0;
 	this.y=0;
 	
-	this.width=40;
-	this.height=40;
+	this.width=20;
+	this.height=20;
 }
 Wood.prototype={
 	build:function(){
 		oGame.saveBuild(this);
+	},
+	buildNav:function(){
+		var sHtml='';
+		
+		
+		sHtml+='<h1>'+this.shortname+'</h1>';
+		sHtml+='<p><img src="'+this.src+'"></p>';
+		
+		getById('nav').innerHTML=sHtml;
 	},
 	clear:function(){
 		

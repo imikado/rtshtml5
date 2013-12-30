@@ -62,74 +62,91 @@ function preload(){
 	oLayer_apercuBrouillard.ctx.globalAlpha=0.9;
 	
 	map = new Map();
-	oGame=new Game;
+	oGame=new Game();
 	
 	setTimeout(load,1000);
 }
 
 
 function load(){
+	//on cache la div de chargement
 	getById('loading').style.display='none';
 	
-	//oLayer_cadre.drawRectStroke(0,0,600,400,'#eee',20);
-	
-	oLayer_perso.ctx.globalCompositeOperation = 'destination-over';
-	 
-	
+	//on construit la map, l'apercu 
+	//et le cadre d'information de la map affichée	 
 	map.build(); 
 	map.buildApercu();
 	map.buildApercuCadre();
 	
+    //on créé une unité de départ
 	var oUnit =new Unit('soldat','WPface.png');
 	oUnit.x=4;
 	oUnit.y=7;
 	oUnit.build();
 	
+	//on ajoute cette unité à un tableau tUnit 
+    //(pour pouvoir boucler dessus pour mettre à jour)
 	oGame.tUnit.push(oUnit);
 	
+    //on créé le batiment de départ (QG)
 	var oBuild=new Build('building','img3/build1.png');
 	oBuild.x=QGx;
 	oBuild.y=QGy;
 	oBuild.build();
 	
+	//on ajoute ce batiment au tableau tBuild 
+	//(pour boucler et réafficher lors d'un scrolling)
 	oGame.tBuild.push(oBuild);
 	
-	
+	//on créé ici une mine d'or sur la map
 	var oBuild=new Build('or','img3/mine-or.png');
 	oBuild.x=17;
 	oBuild.y=17;
 	oBuild.build();
 	
+	//on ajoute cette mine d'or au tableau tBuild
 	oGame.tBuild.push(oBuild);
 	
-	 oGame.rebuild();
-	 oGame.buildRessource();
-//	oGame.displayVisibility();
-	
+	//on affiche les batiments sur la carte
+	oGame.rebuild();
+	//on affiche les ressouces de départ (or/bois)
+	oGame.buildRessource();
+
+	//on affiche les zones réactives
+	//pour scroller la map avec la souris
 	oGame.drawDirection();
-	 
+
+	//on commencera la boucle de raffraichissement run() 
+    //dans N secondes
 	setTimeout(run,fps);
 	
 }
 function run(){  
-	//oGame.rebuild();
-	
-	//oLayer_cadre.clear();
-	
+
+	//si la souris est sur une zone active de scroll
 	if(sDirection=='up'){
+		//scroll haut
 		oGame.goUp();
 	}else if(sDirection=='down'){
+		//scroll bas
 		oGame.goDown();
 	}else if(sDirection=='left'){
+		//scroll gauche
 		oGame.goLeft();
 	}else if(sDirection=='right'){
+		//scroll droite
 		oGame.goRight();
 	}else{
+		//sinon on affiche les zones réactives
 		oGame.drawDirection();
+		
+		//on raffraichit les unités
+		oGame.refreshUnit();
 	}
 	
-	oGame.refreshUnit();
-		
+	
+	
+	//dans N secondes on appelera de nouveau cette fonction 
 	setTimeout(run,fps);
 }
 
