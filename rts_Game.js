@@ -35,22 +35,38 @@ Game.prototype={
 		oLayer_cadre.drawRect(0,0,oLayer_map.width,10,'#eeaf17','#eeaf17');
 	},
 	goLeft:function(){
+		if(currentX-1 < 0){
+			return ;
+		}
+		
 		currentX-=1;
 		this.rebuild();
 		oLayer_cadre.drawRect(0,0,10,oLayer_map.height,'#eeaf17','#eeaf17');
 	},
 	goRight:function(){
+		if(currentX+1+maxX > map.tMap[0].length){
+			return ;
+		}
+		
 		currentX+=1;
 		this.rebuild();
 		oLayer_cadre.drawRect(oLayer_map.width-10,0,10,oLayer_map.height,'#eeaf17','#eeaf17');
 	},
 	goDown:function(){
+		if(currentY+1+maxY > map.tMap.length){
+			return ;
+		}
+		
 		currentY+=1;
 		this.rebuild();
 		oLayer_cadre.drawRect(0,oLayer_map.height-10,100,10,'#eeaf17','#eeaf17');
 		oLayer_cadre.drawRect(500,oLayer_map.height-10,300,10,'#eeaf17','#eeaf17');
 	},
 	goUp:function(){
+		if(currentY-1 < 0){
+			return ;
+		}
+		
 		currentY-=1;
 		this.rebuild();
 		oLayer_cadre.drawRect(0,0,oLayer_map.width,10,'#eeaf17','#eeaf17');
@@ -148,18 +164,27 @@ Game.prototype={
 		
 		return y+currentY;
 	},
+	
+	getXApercu:function(e){
+		var x=this.getXmouse(e)-600;
+		x=parseInt( x/map.miniWidth);
+	
+		return x;
+	},
+	getYApercu:function(e){
+		var y=this.getYmouse(e)-422;
+		y=parseInt( y/map.miniWidth);
+		
+		return y;
+	},
+	
 	isWalkable:function(x,y){
 		if(this.tCoordBuild[y] && this.tCoordBuild[y][x] && this.tCoordBuild[y][x]!=''){
 			return false;
 		}
 		return true;
 	},
-	//appelé lors d'un clic droit sur le canvas (pour un deplacement d'unité)
-	clickdroit:function(e){
-		//recuperation des coordonnées "tableau" x y
-		var x=this.getX(e);
-		var y=this.getY(e);
-
+	goto:function(x,y){
 		//recuperation de batiment sur ces coordonnées
 		var aBuild=this.getBuild(x,y);
 
@@ -181,13 +206,41 @@ Game.prototype={
 		}else if(!this.isWalkable(x,y)){
 			//si la case n'est pas accessible, il ne se passe rien
 		
-			return false;
 		}else if(this.selected!=''){
 			//si la case est accessible, on y indique à l'unité d'y aller
 			this.selected.setTarget(x,y);
 		}
+	},
+	//appelé lors d'un clic droit sur le canvas (pour un deplacement d'unité)
+	clickdroit:function(e){
+		//recuperation des coordonnées "tableau" x y
+		var x=this.getX(e);
+		var y=this.getY(e);
 
+		this.goto(x,y);
 		return false;
+
+	},
+	clickdroitApercu:function(e){
+		//recuperation des coordonnées "tableau" x y
+		var x=this.getXApercu(e);
+		var y=this.getYApercu(e);
+		
+		this.goto(x,y);
+		return false;
+	},
+	clickApercu:function(e){
+		//recuperation des coordonnées "tableau" x y
+		var x=this.getXApercu(e);
+		var y=this.getYApercu(e);
+		
+		currentX=x-(maxX/2);
+		currentY=y-(maxY/2);
+		
+		if(currentX < 0 ){ currentX=0;}
+		if(currentY < 0 ){ currentY=0;}
+		
+		sDirection='refresh';
 	},
 	//appelée lors d'un clic gauche sur le canvas (sélection d'une unité/batiment)
 	click:function(e){
@@ -370,7 +423,7 @@ Game.prototype={
 				var aBuild=this.getBuild(newX,newY);
 				
 				//si la cible est le QG
-				if(aBuild && aBuild.name=='building'){
+				if(aBuild && aBuild.name=='QG'){
 					oUnit.x=newX;
 					oUnit.y=newY;
 					
@@ -470,8 +523,8 @@ Game.prototype={
 		this.drawSelected();
 		
 	},
-	createBuild:function(name,src){
-		var oBuildcreation = new Buildcreation(name,src);
+	createBuild:function(name){
+		var oBuildcreation = new Buildcreation(name);
 		oBuildcreation.build();
 		
 		this.buildcreation=oBuildcreation;

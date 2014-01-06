@@ -79,7 +79,7 @@ function load(){
 	map.buildApercuCadre();
 	
     //on créé une unité de départ
-	var oUnit =new Unit('soldat','WPface.png');
+	var oUnit =new Unit('Wordker');
 	oUnit.x=4;
 	oUnit.y=7;
 	oUnit.build();
@@ -89,7 +89,7 @@ function load(){
 	oGame.tUnit.push(oUnit);
 	
     //on créé le batiment de départ (QG)
-	var oBuild=new Build('building','img3/build1.png');
+	var oBuild=new Build('QG');
 	oBuild.x=QGx;
 	oBuild.y=QGy;
 	oBuild.build();
@@ -99,7 +99,7 @@ function load(){
 	oGame.tBuild.push(oBuild);
 	
 	//on créé ici une mine d'or sur la map
-	var oBuild=new Build('or','img3/mine-or.png');
+	var oBuild=new Build('or');
 	oBuild.x=17;
 	oBuild.y=17;
 	oBuild.build();
@@ -137,6 +137,12 @@ function run(){
 		//scroll droite
 		oGame.goRight();
 	}else{
+		//si direction refresh, on redessine la map
+		if(sDirection=='refresh'){
+			oGame.rebuild();
+			sDirection='';
+		}
+		
 		//sinon on affiche les zones réactives
 		oGame.drawDirection();
 		

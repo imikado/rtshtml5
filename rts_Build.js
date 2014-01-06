@@ -1,7 +1,6 @@
 //build
 function Build(name,src){
 	this.name=name;
-	this.src=src;
 	this.oImage='';
 	
 	this.x=0;
@@ -11,24 +10,41 @@ function Build(name,src){
 	this.width=widthCase*2;
 	this.height=widthCase*2;
 	
-	this.tName=Array();
-	this.tName['building']='Quartier g&eacute;n&eacute;ral';
-	this.tName['or']='Mine d\'or ';
-	this.tName['buid2']='Barrack';
+	this.color='#064474';
+	this.bVisibility=1;
 	
-	this.shortname=this.tName[name];
+	this.costOr=0;
+	this.costWood=0;
 	
 	if(this.name=='or'){
 		this.color='#e8bb08';
+		this.bVisibility=0;
+		this.shortname='Mine d\'or';
+		this.src='img3/mine-or.png';
 		this.unitCreation ='';
-	}else{
-		this.color='#064474';
-		if(this.name=='building'){
-			this.unitCreation =new UnitCreation('soldat','WPface.png');
-		}else{
-			this.unitCreation =new UnitCreation('tank','WC.png');
-		}
+	}else if(this.name=='QG'){
+		this.shortname='Quartier g&eacute;n&eacute;ral';
+		this.src='img3/build1.png';
+		
+		this.unitCreation =new Unit('Worker');
+	}else if(this.name=='SoldierHouse'){
+		this.shortname='Batiment des soldats';
+		this.src='img3/build2.png';
+		
+		this.costOr=100;
+		this.costWood=100;
+		
+		this.unitCreation =new Unit('Soldier');
+	}else if(this.name=='ArcherHouse'){
+		this.shortname='Batiment des archers';
+		this.src='img3/build3.png';
+		
+		this.costOr=200;
+		this.costWood=50;
+		
+		this.unitCreation =new Unit('Archer');
 	}
+	
 }
 Build.prototype={
 	build:function(){
@@ -44,7 +60,7 @@ Build.prototype={
 		 
 		oGame.saveBuild(this);
 		
-		if(this.name!='or'){
+		if(this.bVisibility){
 			oGame.setVisibility(this.x,this.y);
 			oGame.setVisibility(this.x+1,this.y+1);
 		}
@@ -66,7 +82,7 @@ Build.prototype={
 		
 			sHtml+='<h2>Cr&eacute;ation unit</h2>';
 			
-			sHtml+='<p><input class="btnImage" type="image" src="img3/'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/></p>';
+			sHtml+='<p><input class="btnImage" type="image" src="'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/></p>';
 		}
 	
 		getById('nav').innerHTML=sHtml;
@@ -85,10 +101,8 @@ Build.prototype={
 	}
 };
 //build creation (pour le choix d'un emplacement où construire un batiment)
-function Buildcreation(name,src){
+function Buildcreation(name){
 	this.name=name;
-	this.src='img3/'+src;
-	this.file=src;
 	this.oImage='';
 	
 	this.x=0;

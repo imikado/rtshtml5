@@ -103,6 +103,12 @@
 		background:white;
 		border:3px solid #ccc;
 	}
+	.btnImageOff{
+		width:20px;
+		padding:4px;
+		background:#970e0e;
+		border:3px solid #970e0e;
+	}
 	.curseur td{
 		padding:0px;
 		margin:0px;
@@ -130,10 +136,12 @@
 		<div id="menu">Or: 100 </div>
 		<div id="nav"></div>
 
-		<canvas id="layer_apercu" width="200" height="200"></canvas>
-		<canvas id="layer_apercuBuild" width="200" height="200"></canvas>
-		<canvas id="layer_apercuBrouillard" width="200" height="200"></canvas>
-		<canvas id="layer_apercuCadre" width="200" height="200"></canvas>
+		<div onclick="oGame.clickApercu(event)" oncontextmenu="return oGame.clickdroitApercu(event)">
+			<canvas id="layer_apercu" width="200" height="200"></canvas>
+			<canvas id="layer_apercuBuild" width="200" height="200"></canvas>
+			<canvas id="layer_apercuBrouillard" width="200" height="200"></canvas>
+			<canvas id="layer_apercuCadre" width="200" height="200"></canvas>
+		</div>
 
 		<div id="loading">Loading...</div>
 
