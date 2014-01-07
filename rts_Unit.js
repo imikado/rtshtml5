@@ -2,6 +2,8 @@ function Unit(name){
 	this.name=name;
 	this.oImage='';
 	
+	this.selected=0;
+	
 	this.x=0;
 	this.y=0;
 	this.life=100;
@@ -56,6 +58,8 @@ Unit.prototype={
 			
 			oLayer_perso.fillRect((this.x-currentX)*widthCase,((this.y-currentY)*heightCase)+heightCase-2,widthCase,2,'#00ff00');
 			
+			oLayer_select.drawRectStroke((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,this.selected.width,this.selected.height,'#880044',3);
+
 		}
 		
 		//si l'unité doit construire un batiment, et qu'elle se trouve sur les lieux de la construction
@@ -102,6 +106,10 @@ Unit.prototype={
 	setTarget:function(x,y){
 		this.targetX=x;
 		this.targetY=y;
+	},
+	clearTarget:function(){
+		this.targetX='';
+		this.targetY='';
 	},
 	buildNav:function(){
 		var sHtml='';

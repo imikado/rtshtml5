@@ -46,7 +46,7 @@
 		top:0px;
 		left:0px;
 		width:600px;
-		
+		height:400px;
 	}
 	#menu{
 		position:absolute;
@@ -120,9 +120,9 @@
 	</style>
 	
 	</head>
-	<body onload="preload()">
+	<body onload="preload()" onkeydown="oGame.keydown(event)">
 
-		<div id="content" onmousemove="oGame.mousemove(event)" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)">
+		<div id="content" onmousemove="oGame.mousemove(event)" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
 		<canvas id="layer_map" width="800" height="400"></canvas>
 		<canvas id="layer_building" width="800" height="400"></canvas>
 		<canvas id="layer_perso" width="800" height="400"></canvas>

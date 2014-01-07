@@ -64,6 +64,10 @@ function preload(){
 	map = new Map();
 	oGame=new Game();
 	
+	document.body.onkeyup=function (event){
+		oGame.keyup(event);
+	}
+	
 	setTimeout(load,1000);
 }
 

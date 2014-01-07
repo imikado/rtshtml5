@@ -156,6 +156,8 @@ function Wood(){
 	
 	this.width=20;
 	this.height=20;
+	
+	this.ressource=30;
 }
 Wood.prototype={
 	build:function(){
@@ -171,6 +173,12 @@ Wood.prototype={
 		getById('nav').innerHTML=sHtml;
 	},
 	clear:function(){
+		map.tMap[this.y][this.x]=3;
+		oGame.clearBuild(this);
+		sDirection='refresh';
 		
+		
+		
+		console.log('on supprime l arbre y:'+this.y+' x:'+this.x);
 	}
 }

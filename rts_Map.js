@@ -96,13 +96,15 @@ Map.prototype={
 						this.drawImage( 3 ,x,y);
 						//puis on créé un objet arbre par dessus
 						var oWood=new Wood();
-						oWood.x=x;
-						oWood.y=y;
+						oWood.x=x2;
+						oWood.y=y2;
 						oWood.build();
+						
+						console.log('creation d un arbre y:'+y+' x:'+x);
 						
 						//on ajoute cette arbre au tableau des batiments
 						//pour les reconstruire lors du scrolling
-						oGame.tBuild.push(oWood);
+						//oGame.tBuild.push(oWood);
 					}
 					//on dessine sur le canvas la valeur du tableau
 					this.drawImage( this.tMap[y2][x2] ,x,y);

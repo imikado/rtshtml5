@@ -7,7 +7,7 @@ function Game(){
 	//le mode en cours 
 	this.mode='';
 	//l'element selectionné (unité/batiment...)
-	this.selected='';
+	this.tSelected=new Array();
 	//le batiment selectionné à construire
 	this.buildcreation='';
 	//le tableau des cases visibles sur la carte
@@ -16,6 +16,8 @@ function Game(){
 	this.tBuild=Array();
 	//idem pour les unités
 	this.tUnit=Array();
+	
+	this.shiftClicked=0;
 	
 	//ressources
 	this.iOr=250;
@@ -121,6 +123,11 @@ Game.prototype={
 			return false;
 		}
 		
+		if(this.tCoordUnit[ y ] && this.tCoordUnit[ y ][ x ] && this.tCoordUnit[ y ][ x ]!=''){
+			console.log('not libre tCoordUnit[ '+y+' ][ '+x+' ]');
+			return false;
+		}
+		
 		if(map.tMap[y] && map.tMap[y][x] && map.tMap[y][x]==3){
 		
 			return true;
@@ -182,6 +189,10 @@ Game.prototype={
 		if(this.tCoordBuild[y] && this.tCoordBuild[y][x] && this.tCoordBuild[y][x]!=''){
 			return false;
 		}
+		
+		if(this.tCoordUnit[y] && this.tCoordUnit[y][x] && this.tCoordUnit[y][x]!=''){
+			return false;
+		}
 		return true;
 	},
 	goto:function(x,y){
@@ -189,26 +200,28 @@ Game.prototype={
 		var aBuild=this.getBuild(x,y);
 
 		//si une unité est sélectionnée et que le batiment cliqué est une mine ou du bois
-		if(this.selected!='' && aBuild && ( aBuild.name=='or' || aBuild.name=='wood' )){
+		if(this.tSelected.length && aBuild && ( aBuild.name=='or' || aBuild.name=='wood' )){
 			//on créé une ronde du bois/or vers le QG
 			//pour alimenter les ressources Or/bois
 			
-			//on indique que la destination de cycle c'est la mine d'or ou l'arbre
-			this.selected.cycleToX=x;
-			this.selected.cycleToY=y;
+			for(var i=0;i<this.tSelected.length;i++){
+			
+				//on indique que la destination de cycle c'est la mine d'or ou l'arbre
+				this.tSelected[i].cycleToX=x;
+				this.tSelected[i].cycleToY=y;
 
-			//on indique que la provenance du cycle c'est le QG
-			this.selected.cycleFromX=QGx;
-			this.selected.cycleFromY=QGy;
+				//on indique que la provenance du cycle c'est le QG
+				this.tSelected[i].cycleFromX=QGx;
+				this.tSelected[i].cycleFromY=QGy;
 
-			//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
-			this.selected.setTarget(x,y);
-		}else if(!this.isWalkable(x,y)){
-			//si la case n'est pas accessible, il ne se passe rien
-		
-		}else if(this.selected!=''){
-			//si la case est accessible, on y indique à l'unité d'y aller
-			this.selected.setTarget(x,y);
+				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
+				this.tSelected[i].setTarget(x,y);
+			}
+		}else if(this.isWalkable(x,y) && this.tSelected.length){
+			for(var i=0;i <this.tSelected.length;i++){
+				//si la case est accessible, on y indique à l'unité d'y aller
+				this.tSelected[i].setTarget(x,y);
+			}
 		}
 	},
 	//appelé lors d'un clic droit sur le canvas (pour un deplacement d'unité)
@@ -248,6 +261,7 @@ Game.prototype={
 		var x=this.getX(e);
 		var y=this.getY(e);
 		
+		
 		//si l'utilisateur a séléctionné un batiment à construire
 		if(this.buildcreation!=''){
 			
@@ -273,7 +287,7 @@ Game.prototype={
 			this.buildcreation.clear();
 			//on indique à l'unité qui doit construire
 			//le batiment à construire
-			this.selected.buildOn(this.buildcreation);
+			this.tSelected[0].buildOn(this.buildcreation);
 			
 			//on annule la construction en cours
 			this.buildcreation='';
@@ -288,9 +302,14 @@ Game.prototype={
 		
 		//si il y a une unité
 		if(oUnit){
+			//si la touche shift n'est pas cliqué en efface le tableau de sélection
+			if(!this.shiftClicked){
+				this.clearSelect();
+			}
 			//on selectionne celle-ci
 			this.select(oUnit);
 		}else if(oBuild){
+			this.clearSelect();
 			//si  il y a un batiment,
 			//on le selectionne
 			this.select(oBuild);
@@ -299,6 +318,17 @@ Game.prototype={
 			console.log('pas trouve');
 			this.clearSelect();
 		}
+	},
+	keydown:function(e){
+		var touche = e.keyCode;
+
+		//si shirt, on enregistre que shift est pressé
+		if(touche==16){
+			this.shiftClicked=1;
+		}
+	},
+	keyup:function(e){
+		this.shiftClicked=0;
 	},
 	saveBuild:function(oBuild){
         //on recupere les coordonnées du batiment 
@@ -310,6 +340,14 @@ Game.prototype={
 		if(!this.tCoordBuild[y]){
 			this.tCoordBuild[y]=Array();
 		}
+		
+		if(oBuild.name=='wood'){
+			//si c'est un arbre: on prend qu'une case pas 4
+			this.tCoordBuild[y][x]=oBuild;
+			return;
+		}
+		
+		
 		if(!this.tCoordBuild[y+1]){
 			this.tCoordBuild[y+1]=Array();
 		}
@@ -318,6 +356,12 @@ Game.prototype={
 		this.tCoordBuild[y+1][x+1]=oBuild;
 		this.tCoordBuild[y][x+1]=oBuild;
 		
+	},
+	clearBuild:function(oBuild){
+		var y=oBuild.y;
+		var x=oBuild.x;
+		
+		this.tCoordBuild[y][x]='';
 	},
 	getBuild:function(x,y){
 		if(this.tCoordBuild[y] &&  this.tCoordBuild[y][x]){
@@ -364,13 +408,13 @@ Game.prototype={
 	clearSelect:function(){
 		//on efface le calque
 		oLayer_select.clear();
-		this.selected='';
+		this.tSelected=new Array();
 		//on efface le bloc du bas
 		this.resetNav();
 	},
 	select:function(oMix){
 		//on enregistre l'unité/batiment
-		this.selected=oMix;
+		this.tSelected.push(oMix);
 		
 		//on demande son dessin
 		this.drawSelected();
@@ -382,8 +426,10 @@ Game.prototype={
 		//on efface le calque
 		oLayer_select.clear();
 		
-		//on dessine un cadre sur un des calques au dimension de l'élement
-		oLayer_select.drawRectStroke((this.selected.x-currentX)*widthCase,(this.selected.y-currentY)*heightCase,this.selected.width,this.selected.height,'#880044',3);
+		for(var i=0;i<this.tSelected.length;i++){
+			//on dessine un cadre sur un des calques au dimension de l'élement
+			oLayer_select.drawRectStroke((this.tSelected[i].x-currentX)*widthCase,(this.tSelected[i].y-currentY)*heightCase,this.tSelected[i].width,this.tSelected[i].height,'#880044',3);
+		}
 	},
 	resetNav:function(){
 		getById('nav').innerHTML='';
@@ -402,6 +448,9 @@ Game.prototype={
 				
 				//on efface le dessin sur le calques
 				oUnit.clear();
+				
+				var lastX=oUnit.x;
+				var lastY=oUnit.y;
 				
 				//on initialise les nouvelles coordonnées
 				var newX=oUnit.x;
@@ -422,8 +471,8 @@ Game.prototype={
 				//on verifie si aux coordonnées cible, il y a un batiment
 				var aBuild=this.getBuild(newX,newY);
 				
-				//si la cible est le QG
-				if(aBuild && aBuild.name=='QG'){
+				//si la cible est le QG et que l'on est en "ronde"
+				if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
 					oUnit.x=newX;
 					oUnit.y=newY;
 					
@@ -444,18 +493,28 @@ Game.prototype={
 					oUnit.wood=0;
 				
 				//si la cible c'est un arbre et que le compteur est inferieur à N
-				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8){
+				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8  && oUnit.cycleToX!=''){
+					
 					//on met en place un compteur 
 					//pour que la ressources mette du temps
 					//a recuperer la ressource
 					oUnit.counter+=1;
 					
+					oUnit.build();
+					
 					continue;
 					
 				//si le compteur est superieur à N
-				}else if(aBuild && aBuild.name=='wood' && oUnit.counter >= 8){
+				}else if(aBuild && aBuild.name=='wood' && oUnit.counter >= 8 && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.wood=10;
+					
+					//a chaque iteration on decremente la ressource
+					aBuild.ressource-=10;
+					//si l'arbre est épuisé, on le supprime de la carte
+					if(aBuild.ressource<=0){
+						aBuild.clear();
+					}
 					
 					oUnit.x=newX;
 					oUnit.y=newY;
@@ -467,7 +526,7 @@ Game.prototype={
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
 				
 				//si la cible c'est une mine d'or et que le compteur est inferieur à N
-				}else if(aBuild && aBuild.name=='or' && oUnit.counter < 8){
+				}else if(aBuild && aBuild.name=='or' && oUnit.counter < 8  && oUnit.cycleToX!=''){
 					//on met en place un compteur 
 					//pour que la ressources mette du temps
 					//a recuperer la ressource
@@ -475,7 +534,7 @@ Game.prototype={
 					
 					continue;
 				//si le compteur est superieur à N
-				}else if(aBuild && aBuild.name=='or' && oUnit.counter >= 8){
+				}else if(aBuild && aBuild.name=='or' && oUnit.counter >= 8  && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.or=10;
 					
@@ -511,6 +570,11 @@ Game.prototype={
 				
 				//on dessine l'unité
 				oUnit.build();
+				
+				//si la position n'est pas differente d'avant le calcul: l'unite est bloque, on annule sa cible
+				if(lastX==oUnit.x && lastY==oUnit.y){
+					oUnit.clearTarget();
+				}
 				
 				console.log('recalcul');
 				//on met à jour la partie visible de la carte
