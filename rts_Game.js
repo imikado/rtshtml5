@@ -434,6 +434,21 @@ Game.prototype={
 	resetNav:function(){
 		getById('nav').innerHTML='';
 	},
+	refreshBuild:function(){
+		for(var i=0;i< this.tBuild.length;i++){
+			var oBuild= this.tBuild[i];
+			if(oBuild.level < 0){
+				
+				oBuild.sSprite='_'+oBuild.level;
+				oBuild.build();
+				oBuild.level++;
+			}else if(oBuild.sSprite!=''){
+				oBuild.sSprite='';
+				oBuild.build();
+			}
+		
+		}
+	},
 	refreshUnit:function(){
 		
 		//on boucle sur les unités existantes

@@ -33,15 +33,89 @@ var sDirection='';
 
 
 function Images(){
-	
+	this.tOImg=new Array();
+	this.tDetail=new Array();
+	this.counter=0;
 }
 Images.prototype={
-	load:function(src){
+	load:function(src,idImg){
+		this.tOImg[idImg]=new Image();
+		this.tOImg[idImg].src=src;
+		this.tOImg[idImg].onload=function(){
+			oImages.counter++;
+			preload2();
+		}
+		//this.tOImg[idImg]=oImg;
+	},
+	setDetailOnId:function(id,y,x,width,height,idImg){
+		this.tDetail[id]=new Array();
+		this.tDetail[id]['x']=x;
+		this.tDetail[id]['y']=y;
+		this.tDetail[id]['width']=width;
+		this.tDetail[id]['height']=height;
+		this.tDetail[id]['idImg']=idImg;
+	},
+	drawImageOnLayer:function(id,x,y,width,height,sLayer){
+		var oCanvasTmp;
+		if(sLayer=='map'){
+			oCanvasTmp=oLayer_map;
+		}else if(sLayer=='apercu'){
+			oCanvasTmp=oLayer_apercu;
+		}else if(sLayer=='perso'){
+			oCanvasTmp=oLayer_perso;
+		}else if(sLayer=='building'){
+			oCanvasTmp=oLayer_building;
+		}
 		
-	}
+		oCanvasTmp.drawImage2(this.tOImg[ this.tDetail[id]['idImg'] ],this.tDetail[id]['x'],this.tDetail[id]['y'],this.tDetail[id]['width'],this.tDetail[id]['height'],x,y,width,height);
+		
+	},
 };
 
 function preload(){
+	
+	oImages=new Images();
+	
+	var tDetailTmp=new Array();
+	tDetailTmp=[
+		['case-beige2','case-water','case-beige','case-wood'],
+		['unit-worker'],
+		['unit-soldier'],
+		['unit-archer'],
+	];
+	for(var y=0;y<tDetailTmp.length;y++){
+		for(var x=0;x<tDetailTmp[y].length;x++){
+			oImages.setDetailOnId(tDetailTmp[y][x],y*40,x*40,40,40,'1x1');
+		}
+	}
+	var tDetailTmp=new Array();
+	tDetailTmp=[
+		['build-SoldierHouse','build-SoldierHouse_-2','build-SoldierHouse_-1'],
+		['build-QG','build-QG_-2','build-QG_-1'],
+		['build-ArcherHouse','build-ArcherHouse_-2','build-ArcherHouse_-1'],
+		
+		['build-mineOr'],
+	];
+	for(var y=0;y<tDetailTmp.length;y++){
+		for(var x=0;x<tDetailTmp[y].length;x++){
+			oImages.setDetailOnId(tDetailTmp[y][x],y*80,x*80,80,80,'2x2');
+		}
+	}
+	
+	oImages.load('img3/sprite1x1.png','1x1');
+	oImages.load('img3/sprite2x2.png','2x2');
+	
+}
+
+function preload2(){
+	
+	if(oImages.counter < 2){
+		console.log('pas fini de charger :'+oImages.counter);
+		return;
+	}
+	
+	
+	
 	oLayer_map=new Canvas('layer_map');
 	oLayer_apercu=new Canvas('layer_apercu');
 	oLayer_building=new Canvas('layer_building');
@@ -61,8 +135,10 @@ function preload(){
 	oLayer_apercuBrouillard=new Canvas('layer_apercuBrouillard');
 	oLayer_apercuBrouillard.ctx.globalAlpha=0.9;
 	
-	map = new Map();
+	
 	oGame=new Game();
+	map = new Map();
+	map.build();
 	
 	document.body.onkeyup=function (event){
 		oGame.keyup(event);
@@ -125,6 +201,7 @@ function load(){
 	setTimeout(run,fps);
 	
 }
+var iRefreshBuild=0;
 function run(){  
 
 	//si la souris est sur une zone active de scroll
@@ -152,6 +229,13 @@ function run(){
 		
 		//on raffraichit les unités
 		oGame.refreshUnit();
+		
+		if(iRefreshBuild> 3){
+			oGame.refreshBuild();
+			iRefreshBuild=0;
+		}
+		
+		iRefreshBuild++;
 	}
 	
 	

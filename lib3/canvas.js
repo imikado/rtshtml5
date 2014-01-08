@@ -121,6 +121,10 @@ Canvas.prototype={
 		this.ctx.drawImage(img,x,y ,width,height  );
 	}
 	,
+	drawImage2: function (img,x,y,width,height,x2,y2,width2,height2){
+		this.ctx.drawImage(img,x,y ,width,height,x2,y2,width2,height2  );
+	}
+	,
 	isInThisLosange: function(x,y){
 
 	},

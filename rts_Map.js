@@ -56,6 +56,14 @@ function Map(){
 		[2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
 		[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
 	];
+	
+	this.tImg=Array();
+	
+	this.tImg[1]='case-beige';
+	this.tImg[2]='case-water';
+	this.tImg[3]='case-beige2';
+	this.tImg[4]='case-wood';
+	/*
 	this.tImg=Array();
 	
 	this.tImg[1]='case-beige.png';
@@ -73,7 +81,7 @@ function Map(){
 			
 			this.tOImg[i]=oImg;
 		}
-	}
+	}*/
 	
 	this.miniWidth=3;
 	
@@ -91,7 +99,8 @@ Map.prototype={
 				 
 				if(this.tMap[y2] && this.tMap[y2][x2]){
 					//si c'est un arbre
-					if(this.tMap[y2][x2]==4){
+					
+					if(this.tMap[y2][x2]==40){
 						//on dessine un case normale
 						this.drawImage( 3 ,x,y);
 						//puis on créé un objet arbre par dessus
@@ -102,9 +111,6 @@ Map.prototype={
 						
 						console.log('creation d un arbre y:'+y+' x:'+x);
 						
-						//on ajoute cette arbre au tableau des batiments
-						//pour les reconstruire lors du scrolling
-						//oGame.tBuild.push(oWood);
 					}
 					//on dessine sur le canvas la valeur du tableau
 					this.drawImage( this.tMap[y2][x2] ,x,y);
@@ -116,21 +122,7 @@ Map.prototype={
 	},
 	//la methode pour dessiner sur le canvas
 	drawImage:function(iImg,x,y){
-		if(!this.tOImg[iImg]){
-			var oImg=new Image();
-			oImg.src='img3/'+this.tImg[iImg];
-			oImg._x=x;
-			oImg._y=y;
-			oImg.onload=function(){
-				oLayer_map.drawImage(this,this._x*widthCase,this._y*heightCase,widthCase,widthCase);
-				
-			}
-			this.tOImg[iImg]=oImg;
-			
-		}else{
-			oLayer_map.drawImage(this.tOImg[iImg],x*widthCase,y*heightCase,widthCase,widthCase);
-		}
-		
+		oImages.drawImageOnLayer(this.tImg[iImg],x*widthCase,y*heightCase,widthCase,widthCase,'map');
 	},
 	rebuild:function(){
 		for(var y=0;y< maxY;y++){
@@ -172,10 +164,7 @@ Map.prototype={
 		}
 		oLayer_apercuBrouillard.fillRect(0,0,400,400,'#000000');
 	},
-	drawMiniImage:function(iImg,x,y){
-		oLayer_apercu.drawImage(this.tOImg[iImg],x*this.miniWidth,y*this.miniWidth,this.miniWidth,this.miniWidth);
-		
-	},
+	 
 	//dessin du cadre indiquant la partie affichée en détail
 	buildApercuCadre:function(){
 		oLayer_apercuCadre.clear();
@@ -183,8 +172,8 @@ Map.prototype={
 	},
 	
 	drawMiniImage:function(iImg,x,y){
-		oLayer_apercu.drawImage(this.tOImg[iImg],x*this.miniWidth,y*this.miniWidth,this.miniWidth,this.miniWidth);
-		
+		//oLayer_apercu.drawImage(this.tOImg[iImg],x*this.miniWidth,y*this.miniWidth,this.miniWidth,this.miniWidth);
+		oImages.drawImageOnLayer(this.tImg[iImg],x*this.miniWidth,y*this.miniWidth,this.miniWidth,this.miniWidth,'apercu');
 	},
 	drawMiniBuild:function(x,y,sColor){
 		oLayer_apercuBuild.fillRect(x*this.miniWidth,y*this.miniWidth,this.miniWidth*2,this.miniWidth*2,sColor);

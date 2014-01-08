@@ -2,6 +2,9 @@
 function Build(name,src){
 	this.name=name;
 	this.oImage='';
+	this.idImg='';
+	this.level=0;
+	this.sSprite='';
 	
 	this.x=0;
 	this.y=0;
@@ -22,14 +25,17 @@ function Build(name,src){
 		this.shortname='Mine d\'or';
 		this.src='img3/mine-or.png';
 		this.unitCreation ='';
+		this.idImg='build-mineOr';
 	}else if(this.name=='QG'){
 		this.shortname='Quartier g&eacute;n&eacute;ral';
 		this.src='img3/build1.png';
+		this.idImg='build-QG';
 		
 		this.unitCreation =new Unit('Worker');
 	}else if(this.name=='SoldierHouse'){
 		this.shortname='Batiment des soldats';
 		this.src='img3/build2.png';
+		this.idImg='build-SoldierHouse';
 		
 		this.costOr=100;
 		this.costWood=100;
@@ -38,6 +44,7 @@ function Build(name,src){
 	}else if(this.name=='ArcherHouse'){
 		this.shortname='Batiment des archers';
 		this.src='img3/build3.png';
+		this.idImg='build-ArcherHouse';
 		
 		this.costOr=200;
 		this.costWood=50;
@@ -48,15 +55,8 @@ function Build(name,src){
 }
 Build.prototype={
 	build:function(){
-		if(this.oImage==''){
-			this.oImage=new Image(this);
-			this.oImage.src=this.src;
-			this.oImage._x=this.x;
-			this.oImage._y=this.y;
-			this.oImage.onload=this.drawImage;
-		}else{
-			oLayer_building.drawImage(this.oImage ,(this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2);
-		}
+		
+		oImages.drawImageOnLayer(this.idImg+this.sSprite,(this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'building');
 		 
 		oGame.saveBuild(this);
 		
@@ -66,9 +66,6 @@ Build.prototype={
 		}
 	
 		map.drawMiniBuild(this.x,this.y,this.color);
-	},
-	drawImage:function(){
-		oLayer_building.drawImage(this ,(this._x-currentX)*widthCase,(this._y-currentY)*heightCase,widthCase*2,widthCase*2);
 	},
 	buildNav:function(){
 		var sHtml='';
@@ -113,33 +110,24 @@ function Buildcreation(name){
 }
 Buildcreation.prototype={
 	build:function(){
-		if(this.oImage==''){
-			this.oImage=new Image(this);
-			this.oImage.src=this.src;
-			this.oImage._x=this.x;
-			this.oImage._y=this.y;
-			this.oImage.onload=this.drawImage;
-		}else{
-			oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'#25db12');
-			
-			if(!oGame.checkCoordVisible(this.x,this.y) || !oGame.checkCoord(this.x,this.y)){
-				oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,widthCase,'#ff0000');
-			}
-			if(!oGame.checkCoordVisible(this.x+1,this.y) || !oGame.checkCoord(this.x+1,this.y) ){
-				oLayer_buildingcreation.fillRect((this.x-currentX+1)*widthCase,(this.y-currentY)*heightCase,widthCase,widthCase,'#ff0000');
-			}
-			if(!oGame.checkCoordVisible(this.x,this.y+1) || !oGame.checkCoord(this.x,this.y+1)){
-				oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY+1)*heightCase,widthCase,widthCase,'#ff0000');
-			}
-			if(!oGame.checkCoordVisible(this.x+1,this.y+1) || !oGame.checkCoord(this.x+1,this.y+1)){
-				oLayer_buildingcreation.fillRect((this.x-currentX+1)*widthCase,(this.y-currentY+1)*heightCase,widthCase,widthCase,'#ff0000');
-			}
+		 
+		oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'#25db12');
+		
+		if(!oGame.checkCoordVisible(this.x,this.y) || !oGame.checkCoord(this.x,this.y)){
+			oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,widthCase,'#ff0000');
+		}
+		if(!oGame.checkCoordVisible(this.x+1,this.y) || !oGame.checkCoord(this.x+1,this.y) ){
+			oLayer_buildingcreation.fillRect((this.x-currentX+1)*widthCase,(this.y-currentY)*heightCase,widthCase,widthCase,'#ff0000');
+		}
+		if(!oGame.checkCoordVisible(this.x,this.y+1) || !oGame.checkCoord(this.x,this.y+1)){
+			oLayer_buildingcreation.fillRect((this.x-currentX)*widthCase,(this.y-currentY+1)*heightCase,widthCase,widthCase,'#ff0000');
+		}
+		if(!oGame.checkCoordVisible(this.x+1,this.y+1) || !oGame.checkCoord(this.x+1,this.y+1)){
+			oLayer_buildingcreation.fillRect((this.x-currentX+1)*widthCase,(this.y-currentY+1)*heightCase,widthCase,widthCase,'#ff0000');
 		}
 		 
 	},
-	drawImage:function(){
-		oLayer_buildingcreation.drawImage(this ,(this._x-currentX)*widthCase,(this._y-currentY)*heightCase);
-	},
+	 
 	clear:function(){
 		oLayer_buildingcreation.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,this.width,this.height);
 	},
@@ -176,9 +164,7 @@ Wood.prototype={
 		map.tMap[this.y][this.x]=3;
 		oGame.clearBuild(this);
 		sDirection='refresh';
-		
-		
-		
+
 		console.log('on supprime l arbre y:'+this.y+' x:'+this.x);
 	}
 }

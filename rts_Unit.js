@@ -1,6 +1,7 @@
 function Unit(name){
 	this.name=name;
 	this.oImage='';
+	this.idImg='';
 	
 	this.selected=0;
 	
@@ -31,14 +32,17 @@ function Unit(name){
 	if(this.name=='Soldier'){
 		this.shortname='Soldat';
 		this.src='img3/WPface.png';
+		this.idImg='unit-soldier';
 		
 	}else if(this.name=='Archer'){
 		this.shortname='Archer';
 		this.src='img3/WC.png';
+		this.idImg='unit-archer';
 			
 	}else if(this.name='Worker'){
 		this.shortname='Ouvrier';
 		this.src='img3/WK.png';
+		this.idImg='unit-worker';
 		
 		this.tBuildCreation.push(new Build('SoldierHouse'));
 		this.tBuildCreation.push(new Build('ArcherHouse'));
@@ -47,20 +51,7 @@ function Unit(name){
 Unit.prototype={
 	build:function(){
 		//partie affichage de l'image de l'unité sur le canvas
-		if(this.oImage==''){
-			this.oImage=new Image(this);
-			this.oImage.src=this.src;
-			this.oImage._x=this.x;
-			this.oImage._y=this.y;
-			this.oImage.onload=this.drawImage;
-		}else{
-			oLayer_perso.drawImage(this.oImage ,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2);
-			
-			oLayer_perso.fillRect((this.x-currentX)*widthCase,((this.y-currentY)*heightCase)+heightCase-2,widthCase,2,'#00ff00');
-			
-			oLayer_select.drawRectStroke((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,this.selected.width,this.selected.height,'#880044',3);
-
-		}
+		oImages.drawImageOnLayer(this.idImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
 		
 		//si l'unité doit construire un batiment, et qu'elle se trouve sur les lieux de la construction
 		if(this.oBuildOn && this.x+1==this.oBuildOn.x && this.y==this.oBuildOn.y){
@@ -69,6 +60,8 @@ Unit.prototype={
 			var aBuild=new Build(this.oBuildOn.name,this.oBuildOn.src);
 			aBuild.x=this.oBuildOn.x;
 			aBuild.y=this.oBuildOn.y;
+			aBuild.level=-2;
+			aBuild.sSprite='_'+aBuild.level;
 			aBuild.build();
 			
 			//ajout du batiment à la liste des batiments (pour la reconstruction lors des scroll)
@@ -99,10 +92,7 @@ Unit.prototype={
 		oLayer_perso.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,heightCase);
 		
 	},
-	drawImage:function(){
-		oLayer_perso.drawImage(this ,((this._x-currentX)*widthCase),((this._y-currentY)*heightCase),widthCase-2,widthCase-2);
-		oLayer_perso.fillRect((this._x-currentX)*widthCase,((this._y-currentY)*heightCase)+heightCase-2,widthCase,2,'#00ff00');
-	},
+	 
 	setTarget:function(x,y){
 		this.targetX=x;
 		this.targetY=y;
