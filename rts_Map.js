@@ -100,7 +100,7 @@ Map.prototype={
 				if(this.tMap[y2] && this.tMap[y2][x2]){
 					//si c'est un arbre
 					
-					if(this.tMap[y2][x2]==40){
+					if(this.tMap[y2][x2]==4){
 						//on dessine un case normale
 						this.drawImage( 3 ,x,y);
 						//puis on créé un objet arbre par dessus
@@ -111,6 +111,7 @@ Map.prototype={
 						
 						console.log('creation d un arbre y:'+y+' x:'+x);
 						
+						oGame.tBuild.push(oWood);
 					}
 					//on dessine sur le canvas la valeur du tableau
 					this.drawImage( this.tMap[y2][x2] ,x,y);
