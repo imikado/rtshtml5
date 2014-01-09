@@ -20,14 +20,16 @@ var oLayer_map;
 var oLayer_building;
 var oLayer_perso;
 var oLayer_select;
+var oLayer_cursor;
 var oLayer_brouillard;
+var oLayer_brouillard2;
 var oLayer_cadre;
 var oLayer_apercu;
 var oLayer_apercuCadre;
 var oLayer_apercuBrouillard;
 var oLayer_apercuBuild;
 
-var fps=250;
+var fps=300;
 
 var sDirection='';
 
@@ -121,11 +123,17 @@ function preload2(){
 	oLayer_building=new Canvas('layer_building');
 	oLayer_perso=new Canvas('layer_perso');
 	oLayer_select=new Canvas('layer_select');
+	oLayer_cursor=new Canvas('layer_cursor');
+	
+	
 	oLayer_buildingcreation=new Canvas('layer_newbuild');
 	oLayer_buildingcreation.ctx.globalAlpha=0.9;
 	
 	oLayer_brouillard=new Canvas('layer_brouillard');
 	oLayer_brouillard.ctx.globalAlpha=0.9;
+	
+	oLayer_brouillard2=new Canvas('layer_brouillard2');
+	oLayer_brouillard2.ctx.globalAlpha=0.5;
 	
 	oLayer_cadre=new Canvas('layer_cadre');
 	oLayer_cadre.ctx.globalAlpha=0.2;
@@ -159,7 +167,7 @@ function load(){
 	map.buildApercuCadre();
 	
     //on créé une unité de départ
-	var oUnit =new Unit('Wordker');
+	var oUnit =new Unit('Worker','blue');
 	oUnit.x=4;
 	oUnit.y=7;
 	oUnit.build();
@@ -168,8 +176,17 @@ function load(){
     //(pour pouvoir boucler dessus pour mettre à jour)
 	oGame.tUnit.push(oUnit);
 	
+	//on créé une enemie qui parcourt la carte
+	var oUnit2 =new Unit('Soldier','green');
+	oUnit2.x=30;
+	oUnit2.y=9;
+	oUnit2.setCycle(10,7,40,9)
+	oUnit2.setTarget(10,7);
+	oUnit2.build();
+	oGame.tUnit.push(oUnit2);
+	
     //on créé le batiment de départ (QG)
-	var oBuild=new Build('QG');
+	var oBuild=new Build('QG','blue');
 	oBuild.x=QGx;
 	oBuild.y=QGy;
 	oBuild.build();
@@ -179,7 +196,7 @@ function load(){
 	oGame.tBuild.push(oBuild);
 	
 	//on créé ici une mine d'or sur la map
-	var oBuild=new Build('or');
+	var oBuild=new Build('or','or');
 	oBuild.x=17;
 	oBuild.y=17;
 	oBuild.build();
@@ -203,6 +220,8 @@ function load(){
 }
 var iRefreshBuild=0;
 function run(){  
+	
+	
 
 	//si la souris est sur une zone active de scroll
 	if(sDirection=='up'){
@@ -236,6 +255,7 @@ function run(){
 		}
 		
 		iRefreshBuild++;
+		
 	}
 	
 	

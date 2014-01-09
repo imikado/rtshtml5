@@ -32,7 +32,7 @@
 		text-align:center;
 		padding-top:400px;
 	}
-	#layer_map, #layer_building, #layer_perso, #layer_select, #layer_newbuild, #layer_brouillard,#layer_cadre{
+	#layer_map, #layer_building, #layer_perso, #layer_select, #layer_newbuild, #layer_brouillard, #layer_brouillard2,#layer_cadre, #layer_cursor{
 		position:absolute;
 		top:0px;
 		width:800px;
@@ -45,7 +45,7 @@
 		position:absolute;
 		top:0px;
 		left:0px;
-		width:600px;
+		width:800px;
 		height:400px;
 	}
 	#menu{
@@ -122,12 +122,15 @@
 	</head>
 	<body onload="preload()" onkeydown="oGame.keydown(event)">
 
-		<div id="content" onmousemove="oGame.mousemove(event)" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
+		<div id="content" onmousemove="oGame.mousemove(event)" onmouseout="oGame.mouseout()" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
 		<canvas id="layer_map" width="800" height="400"></canvas>
 		<canvas id="layer_building" width="800" height="400"></canvas>
 		<canvas id="layer_perso" width="800" height="400"></canvas>
 		<canvas id="layer_select" width="800" height="400"></canvas>
+		<canvas id="layer_cursor" width="800" height="400"></canvas>
+		
 		<canvas id="layer_brouillard" width="800" height="400"></canvas>
+		<canvas id="layer_brouillard2" width="800" height="400"></canvas>
 		<canvas id="layer_newbuild" width="800" height="400"></canvas>
 		
 		<canvas id="layer_cadre" width="800" height="400"></canvas>

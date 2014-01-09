@@ -1,4 +1,4 @@
-function Unit(name){
+function Unit(name,team){
 	this.name=name;
 	this.oImage='';
 	this.idImg='';
@@ -7,7 +7,6 @@ function Unit(name){
 	
 	this.x=0;
 	this.y=0;
-	this.life=100;
 	
 	this.targetX='';
 	this.targetY='';
@@ -29,23 +28,30 @@ function Unit(name){
 	
 	this.tBuildCreation=new Array();
 	
+	this.team=team;
+	
 	if(this.name=='Soldier'){
 		this.shortname='Soldat';
 		this.src='img3/WPface.png';
 		this.idImg='unit-soldier';
+		this.life=150;
+		this.attak=20;
 		
 	}else if(this.name=='Archer'){
 		this.shortname='Archer';
 		this.src='img3/WC.png';
 		this.idImg='unit-archer';
-			
+		this.life=100;
+		this.attak=30;	
 	}else if(this.name='Worker'){
 		this.shortname='Ouvrier';
 		this.src='img3/WK.png';
 		this.idImg='unit-worker';
+		this.life=50;
+		this.attak=5;
 		
-		this.tBuildCreation.push(new Build('SoldierHouse'));
-		this.tBuildCreation.push(new Build('ArcherHouse'));
+		this.tBuildCreation.push(new Build('SoldierHouse',this.team));
+		this.tBuildCreation.push(new Build('ArcherHouse',this.team));
 	}
 }
 Unit.prototype={
@@ -57,7 +63,7 @@ Unit.prototype={
 		if(this.oBuildOn && this.x+1==this.oBuildOn.x && this.y==this.oBuildOn.y){
 			
 			//création du batiment à l'emplacement
-			var aBuild=new Build(this.oBuildOn.name,this.oBuildOn.src);
+			var aBuild=new Build(this.oBuildOn.name,this.team);
 			aBuild.x=this.oBuildOn.x;
 			aBuild.y=this.oBuildOn.y;
 			aBuild.level=-2;
@@ -86,13 +92,26 @@ Unit.prototype={
 		}
 		//on enregistre les nouvelles coordonnées de l'unité
 		oGame.saveUnit(this);
+		
+	},
+	setCycle:function(toX,toY,fromX,fromY){
+		this.cycleToX=toX;
+		this.cycleToY=toY;
+		
+		this.cycleFromX=fromX;
+		this.cycleFromY=fromY;
 	},
 	clear:function(){
 		oGame.clearUnit(this);
 		oLayer_perso.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,heightCase);
 		
 	},
-	 
+	clearObscurity:function(){
+		oLayer_brouillard2.clearRect(
+							(this.x-currentX-2)*widthCase,
+							(this.y-currentY-2)*widthCase,widthCase*5,widthCase*5);
+		console.log('clearObscu');
+	},
 	setTarget:function(x,y){
 		this.targetX=x;
 		this.targetY=y;
@@ -106,8 +125,7 @@ Unit.prototype={
 		
 		sHtml+='<h1>'+this.shortname+'</h1>';
 		
-		sHtml+='<p><img src="'+this.src+'"></p>';
-			
+		sHtml+='<p style="color:white"><img src="'+this.src+'"><strong>Vie:</strong> '+this.life+'</p>';			
 		
 		if(this.tBuildCreation.length){
 			

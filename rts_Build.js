@@ -1,5 +1,5 @@
 //build
-function Build(name,src){
+function Build(name,team){
 	this.name=name;
 	this.oImage='';
 	this.idImg='';
@@ -19,6 +19,8 @@ function Build(name,src){
 	this.costOr=0;
 	this.costWood=0;
 	
+	this.team=team;
+	
 	if(this.name=='or'){
 		this.color='#e8bb08';
 		this.bVisibility=0;
@@ -31,7 +33,7 @@ function Build(name,src){
 		this.src='img3/build1.png';
 		this.idImg='build-QG';
 		
-		this.unitCreation =new Unit('Worker');
+		this.unitCreation =new Unit('Worker',this.team);
 	}else if(this.name=='SoldierHouse'){
 		this.shortname='Batiment des soldats';
 		this.src='img3/build2.png';
@@ -40,7 +42,7 @@ function Build(name,src){
 		this.costOr=100;
 		this.costWood=100;
 		
-		this.unitCreation =new Unit('Soldier');
+		this.unitCreation =new Unit('Soldier',this.team);
 	}else if(this.name=='ArcherHouse'){
 		this.shortname='Batiment des archers';
 		this.src='img3/build3.png';
@@ -49,7 +51,7 @@ function Build(name,src){
 		this.costOr=200;
 		this.costWood=50;
 		
-		this.unitCreation =new Unit('Archer');
+		this.unitCreation =new Unit('Archer',this.team);
 	}
 	
 }
@@ -86,7 +88,7 @@ Build.prototype={
 	},
 	createUnit:function(){
 		var oUnit;
-		oUnit =new Unit(this.unitCreation.name,this.unitCreation.src);
+		oUnit =new Unit(this.unitCreation.name,this.team);
 		
 		oUnit.x=this.x+2;
 		oUnit.y=this.y;

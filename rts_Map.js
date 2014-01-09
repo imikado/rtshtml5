@@ -181,6 +181,12 @@ Map.prototype={
 	},
 	setVisibility:function(x,y){
 		oLayer_apercuBrouillard.clearRect(x*this.miniWidth,y*this.miniWidth,this.miniWidth,this.miniWidth);
+		
+	},
+	fillObscurity:function(){
+		oLayer_brouillard2.clearRect(0,0,800,400);
+		console.log('fillObscu');
+		oLayer_brouillard2.fillRect(0,0,800,400,'#000000');
 	},
 	
 	
