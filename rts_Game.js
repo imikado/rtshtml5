@@ -542,17 +542,51 @@ Game.prototype={
 		//on boucle sur les unités existantes
 		for(var i=0;i< this.tUnit.length;i++){
 			var oUnit= this.tUnit[i];
-			oUnit.attack=0;
 			if(oUnit.life <=0){ continue;}
 			
 			if(this.team==oUnit.team){
 				oUnit.clearObscurity();
 			}
 			
-			//si l'unité doit se rendre quelques part
-			if(oUnit.targetX!='' && oUnit.targetY!='' && (oUnit.targetX!=oUnit.x || oUnit.targetY!=oUnit.y) ){
-			
-				
+			var iAttack=0;
+			//recherche si unité à porté d'attaque
+			var tAttak=[
+						[-1,-1],
+						[0,-1],
+						[1,-1],
+
+						[-1,0],
+						[1,0],
+
+						[-1,+1],
+						[0,+1],
+						[1,+1],
+			];
+			for(var j=0;j<tAttak.length;j++){
+				var oUnit2=this.getUnit(oUnit.x+tAttak[j][0],oUnit.y+tAttak[j][1]);
+				//si unité enemie
+				if(oUnit2 && oUnit2.team!=oUnit.team){
+					iAttack=1;       
+					break;
+				}
+			}
+
+			if(iAttack){    
+
+				oUnit.animate('attack');
+
+				//on decremente l'enemie de la puissance d'attaque
+				oUnit2.life-=oUnit.attak;
+				if(oUnit2.life <=0){
+					oUnit.animate('walking');
+					oUnit2.animate('dead');      
+					//si unite dead, on l'efface du jeu
+					oUnit2.clear();
+					oGame.removeUnit(oUnit2);
+
+				}
+				//si l'unité doit se rendre quelques part
+			}else if(oUnit.targetX!='' && oUnit.targetY!='' && (oUnit.targetX!=oUnit.x || oUnit.targetY!=oUnit.y) ){
 			
 				var vitesse=1;
 				var vitesse2=vitesse*-1;
@@ -582,46 +616,7 @@ Game.prototype={
 				//on verifie si aux coordonnées cible, il y a un batiment
 				var aBuild=this.getBuild(newX,newY);
 				
-				var iAttack=0;
-				//recherche si unité à porté d'attaque
-				var tAttak=[
-							[-1,-1],
-							[0,-1],
-							[1,-1],
-							
-							[-1,0],
-							[1,0],
-							
-							[-1,+1],
-							[0,+1],
-							[1,+1],
-				];
-				for(var j=0;j<tAttak.length;j++){
-					var oUnit2=this.getUnit(oUnit.x+tAttak[j][0],oUnit.y+tAttak[j][1]);
-					//si unité enemie
-					if(oUnit2 && oUnit2.team!=oUnit.team){
-						oUnit.animate('attack');
-						oUnit2.animate('attack');
-						iAttack=1;       
-						break;
-					}
-				}
-                                	
-				if(iAttack){              
-					//on decremente l'enemie de la puissance d'attaque
-					oUnit2.life-=oUnit.attak;
-					if(oUnit2.life <=0){
-						oUnit.animate('walking');
-                        oUnit2.animate('dead');      
-						//si unite dead, on l'efface du jeu
-						oUnit2.clear();
-						oGame.removeUnit(oUnit2);
-						
-						
-                                                
-					}
-				//si la cible est le QG et que l'on est en "ronde"
-				}else if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
+				if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
 					oUnit.x=newX;
 					oUnit.y=newY;
 					
@@ -643,15 +638,15 @@ Game.prototype={
 				
 				//si la cible c'est un arbre et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8  && oUnit.cycleToX!=''){
-					
-					oUnit.animate('wood');
-                                        
+					     
 					//on met en place un compteur 
 					//pour que la ressources mette du temps
 					//a recuperer la ressource
 					oUnit.counter+=1;
 					
 					oUnit.build();
+					//on créé l'animation de bois
+					oUnit.animate('wood');
 					
 					continue;
 					
@@ -756,6 +751,7 @@ Game.prototype={
 			}else if(oUnit.cycleFromX!='' && (oUnit.targetX==oUnit.x || oUnit.targetY==oUnit.y) ){
 				
 				//si arrivee a destination et cycle 
+				oUnit.animate('stand');
 				
 				if(oUnit.cycleObject=='wood'){
 					oUnit.clearCycle();

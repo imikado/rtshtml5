@@ -5,8 +5,8 @@ var oGame;
 var oImages;
 var oSound;
 
-var widthCase=20;
-var heightCase=20;
+var widthCase=20*2;
+var heightCase=20*2;
 
 var currentX=0;
 var currentY=0;
