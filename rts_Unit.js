@@ -22,39 +22,102 @@ function Unit(name,team){
 	
 	this.cycleFromX='';
 	this.cycleFromY='';
-	
 	this.cycleToX='';
 	this.cycleToY='';
+	this.cycleObject='';
 	
 	this.tBuildCreation=new Array();
 	
 	this.team=team;
 	
+	this.attack=0;
+	
+	this.action='';
+	this.oAudio;
+	this.tmpIdImg='';
+	
 	if(this.name=='Soldier'){
 		this.shortname='Soldat';
-		this.src='img3/WPface.png';
+		this.src='img3/unit-soldier.png';
 		this.idImg='unit-soldier';
-		this.life=150;
+		this.life=350;
 		this.attak=20;
+		
+		this.costOr=200;
 		
 	}else if(this.name=='Archer'){
 		this.shortname='Archer';
 		this.src='img3/WC.png';
 		this.idImg='unit-archer';
-		this.life=100;
+		this.life=200;
 		this.attak=30;	
+		
+		this.costOr=500;
 	}else if(this.name='Worker'){
 		this.shortname='Ouvrier';
-		this.src='img3/WK.png';
+		this.src='img3/unit-worker.png';
 		this.idImg='unit-worker';
-		this.life=50;
+		this.life=100;
 		this.attak=5;
+		
+		this.costOr=100;
 		
 		this.tBuildCreation.push(new Build('SoldierHouse',this.team));
 		this.tBuildCreation.push(new Build('ArcherHouse',this.team));
 	}
 }
 Unit.prototype={
+	playSound:function(action,lastAction){
+		if(action==lastAction){
+			return;
+		}
+		this.stopSound();
+		
+		this.oAudio=new Audio();
+		this.oAudio.src=oSound.getSrc(action);
+		this.oAudio.play();
+		
+	},
+	stopSound:function(){
+		if(!this.oAudio){
+			return;
+		}
+		this.oAudio.pause();
+		//this.oAudio.currentTime=0;
+	},
+	animate:function(action){
+
+		oLayer_perso.clearRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2);
+
+		var tmpImg;
+		if(action=='attack'){
+			tmpImg=this.idImg+'_attack';
+			this.playSound('attack',this.action);
+		}else if(action=='walking'){
+			if(this.tmpIdImg==this.idImg+'_walking2'){
+				tmpImg=this.idImg+'_walking';
+			}else{
+				tmpImg=this.idImg+'_walking2';
+			}
+			this.stopSound();
+			this.tmpIdImg=tmpImg;
+		}else if(action=='dead'){
+			this.playSound('dead',this.action);
+			return;
+		}else if(action=='wood'){
+			tmpImg=this.idImg;
+			this.playSound('wood',this.action);
+		}else if(action=='mining'){
+			tmpImg=this.idImg;
+			this.playSound('mining',this.action);
+		}else if(action=='stand'){
+			tmpImg=this.idImg;
+		}
+		
+		oImages.drawImageOnLayer(tmpImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
+		
+		this.action=action;
+	},
 	build:function(){
 		//partie affichage de l'image de l'unité sur le canvas
 		oImages.drawImageOnLayer(this.idImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
@@ -93,13 +156,34 @@ Unit.prototype={
 		//on enregistre les nouvelles coordonnées de l'unité
 		oGame.saveUnit(this);
 		
+		/*if(this.team!=oGame.team){
+			if(!oGame.tObscurity[this.y] || !oGame.tObscurity[this.y][this.x]){
+				this.mask();
+			}
+		}*/
+		
+		
 	},
-	setCycle:function(toX,toY,fromX,fromY){
+	mask:function(){
+		oLayer_perso.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,heightCase);
+	},
+	setCycle:function(toX,toY,fromX,fromY,sObject){
 		this.cycleToX=toX;
 		this.cycleToY=toY;
 		
 		this.cycleFromX=fromX;
 		this.cycleFromY=fromY;
+		
+		this.cycleObject=sObject;
+	},
+	clearCycle:function(toX,toY,fromX,fromY){
+		this.cycleToX='';
+		this.cycleToY='';
+		
+		this.cycleFromX='';
+		this.cycleFromY='';
+		
+		this.cycleObject='';
 	},
 	clear:function(){
 		oGame.clearUnit(this);
@@ -110,7 +194,7 @@ Unit.prototype={
 		oLayer_brouillard2.clearRect(
 							(this.x-currentX-2)*widthCase,
 							(this.y-currentY-2)*widthCase,widthCase*5,widthCase*5);
-		console.log('clearObscu');
+		//console.log('clearObscu');
 	},
 	setTarget:function(x,y){
 		this.targetX=x;
@@ -177,5 +261,5 @@ Unit.prototype={
 		
 		
 		
-	},
+	}
 };

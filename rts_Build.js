@@ -36,7 +36,7 @@ function Build(name,team){
 		this.unitCreation =new Unit('Worker',this.team);
 	}else if(this.name=='SoldierHouse'){
 		this.shortname='Batiment des soldats';
-		this.src='img3/build2.png';
+		this.src='img3/build3.png';
 		this.idImg='build-SoldierHouse';
 		
 		this.costOr=100;
@@ -45,7 +45,7 @@ function Build(name,team){
 		this.unitCreation =new Unit('Soldier',this.team);
 	}else if(this.name=='ArcherHouse'){
 		this.shortname='Batiment des archers';
-		this.src='img3/build3.png';
+		this.src='img3/build2.png';
 		this.idImg='build-ArcherHouse';
 		
 		this.costOr=200;
@@ -56,6 +56,41 @@ function Build(name,team){
 	
 }
 Build.prototype={
+	playSound:function(action,lastAction){
+		if(action==lastAction){
+			return;
+		}
+		this.stopSound();
+		
+		this.oAudio=new Audio();
+		this.oAudio.src=oSound.getSrc(action);
+		this.oAudio.play();
+		
+	},
+	stopSound:function(){
+		if(!this.oAudio){
+			return;
+		}
+		this.oAudio.pause();
+		//this.oAudio.currentTime=0;
+	},
+	animate:function(action){
+
+		oLayer_building.clearRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase*2,widthCase*2);
+
+		var tmpImg;
+		if(action=='building'){
+			tmpImg=this.idImg+'_'+this.level;
+			this.playSound('building',this.action);
+		}else if(action=='normal'){
+			tmpImg=this.idImg;
+			this.stopSound();
+		}
+		
+		oImages.drawImageOnLayer(tmpImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase*2,widthCase*2,'building');
+		
+		this.action=action;
+	},
 	build:function(){
 		
 		oImages.drawImageOnLayer(this.idImg+this.sSprite,(this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'building');
@@ -69,6 +104,12 @@ Build.prototype={
 	
 		map.drawMiniBuild(this.x,this.y,this.color);
 	},
+	clearObscurity:function(){
+		oLayer_brouillard2.clearRect(
+							(this.x-currentX-2)*widthCase,
+							(this.y-currentY-2)*widthCase,widthCase*5,widthCase*5);
+		//console.log('clearObscu');
+	},
 	buildNav:function(){
 		var sHtml='';
 		
@@ -78,15 +119,50 @@ Build.prototype={
 
 		
 		if(this.unitCreation){
+			
+			var sImg='';
 		
 			sHtml+='<h2>Cr&eacute;ation unit</h2>';
 			
-			sHtml+='<p><input class="btnImage" type="image" src="'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/></p>';
+			sHtml+='<table><tr>';
+			
+			sHtml+='<td>';
+			
+			if(oGame.iOr > this.unitCreation.costOr){ 
+	
+			
+				sImg='<input class="btnImage" type="image" src="'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/>';
+				sColor='#fff';
+				
+			}else{
+				
+				sImg='<input class="btnImageOff" type="image" src="'+this.unitCreation.src+'" onclick="alert(\'Pas assez de ressource\')" class="btn" value="createUnit"/>';
+				
+				sColor='#333';
+			}
+			
+			sHtml+='<td style="background:#444;color:'+sColor+';padding:4px 8px;">';
+							
+			sHtml+=sImg;
+		
+			sHtml+='<br/>';
+			sHtml+='<span style="border:1px solid gray;background:yellow">&nbsp;&nbsp;&nbsp;&nbsp;</span> ';
+			sHtml+=this.unitCreation.costOr;
+			
+				
+			sHtml+='</td>';
+			
+			sHtml+='</tr></table>';
+			
 		}
 	
 		getById('nav').innerHTML=sHtml;
 	},
 	createUnit:function(){
+		
+		oGame.iOr-=this.unitCreation.costOr;
+		oGame.buildRessource();
+		
 		var oUnit;
 		oUnit =new Unit(this.unitCreation.name,this.team);
 		
@@ -132,7 +208,7 @@ Buildcreation.prototype={
 	 
 	clear:function(){
 		oLayer_buildingcreation.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,this.width,this.height);
-	},
+	}
 };
 
 //wood
@@ -144,8 +220,8 @@ function Wood(){
 	this.x=0;
 	this.y=0;
 	
-	this.width=20;
-	this.height=20;
+	this.width=widthCase;
+	this.height=widthCase;
 	
 	this.ressource=30;
 }
@@ -167,6 +243,6 @@ Wood.prototype={
 		oGame.clearBuild(this);
 		sDirection='refresh';
 
-		console.log('on supprime l arbre y:'+this.y+' x:'+this.x);
+		console.log('ICI on supprime l arbre y:'+this.y+' x:'+this.x);
 	}
-}
+};

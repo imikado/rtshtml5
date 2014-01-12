@@ -5,12 +5,18 @@ function Sound(){
     this.tSrc=Array();
     this.tOAudio=Array();
     this.tPlaying=Array();
+	this.tType=Array();
 }
 Sound.prototype={
+	getSrc:function(sType){
+		return this.tType[sType];
+	},
     resetPlaying:function(){
 	this.tPlaying=Array();
     },
     add:function(src,id){
+		this.tType[id]=src;
+		
 	    this.tSrc[this.total]=Array();
 	    this.tSrc[this.total]['src']=src;
 	    this.tSrc[this.total]['id']=id;

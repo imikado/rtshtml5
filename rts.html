@@ -16,7 +16,11 @@
 	<script src="rts_Game.js"></script>
 	<script src="rts_Unit.js"></script>
 	<script src="rts_Build.js"></script>
+        <script src="rts_Sound.js"></script>
 	<style>
+	body{
+		background:#000;
+	}
 	*{
 		font-family:arial;
 		font-size:11px;
@@ -26,7 +30,7 @@
 		top:0px;
 		left:0px;
 		width:800px;
-		height:400px;
+		height:800px;
 		background:#000000;
 		color:white;
 		text-align:center;
@@ -36,7 +40,7 @@
 		position:absolute;
 		top:0px;
 		width:800px;
-		height:400px;
+		height:600px;
 	}
 	#layer_map{
 		background:url('img3/case-water.png');
@@ -46,12 +50,13 @@
 		top:0px;
 		left:0px;
 		width:800px;
-		height:400px;
+		height:600px;
+                border-right:1px solid white;
 	}
 	#menu{
 		position:absolute;
 		width:800px;
-		top:400px;
+		top:600px;
 		left:0px;
 		height:20px;
 		background:black;
@@ -59,15 +64,18 @@
 		padding-top:2px;
 		font-family:verdana;
 		font-weight:bold;
+                border-right:1px solid white;
 	}
 	#nav{
 		position:absolute;
-		top:420px;
+		top:620px;
 		left:0px;
 		width:780px;
-		height:184px;
+		height:244px;
 		background:#222;
 		padding:10px;
+                border-right:1px solid white;
+                border-bottom:1px solid white;
 	}
 	#nav h1{
 		color:white;
@@ -90,7 +98,7 @@
 	}
 	#layer_apercu,#layer_apercuCadre,#layer_apercuBuild,#layer_apercuBrouillard{
 		position:absolute;
-		top:422px;
+		top:622px;
 		left:600px;
 		border:1px solid white;
 	}
@@ -123,17 +131,17 @@
 	<body onload="preload()" onkeydown="oGame.keydown(event)">
 
 		<div id="content" onmousemove="oGame.mousemove(event)" onmouseout="oGame.mouseout()" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
-		<canvas id="layer_map" width="800" height="400"></canvas>
-		<canvas id="layer_building" width="800" height="400"></canvas>
-		<canvas id="layer_perso" width="800" height="400"></canvas>
-		<canvas id="layer_select" width="800" height="400"></canvas>
-		<canvas id="layer_cursor" width="800" height="400"></canvas>
+		<canvas id="layer_map" width="800" height="600"></canvas>
+		<canvas id="layer_building" width="800" height="600"></canvas>
+		<canvas id="layer_perso" width="800" height="600"></canvas>
+		<canvas id="layer_select" width="800" height="600"></canvas>
+		<canvas id="layer_cursor" width="800" height="600"></canvas>
 		
-		<canvas id="layer_brouillard" width="800" height="400"></canvas>
-		<canvas id="layer_brouillard2" width="800" height="400"></canvas>
-		<canvas id="layer_newbuild" width="800" height="400"></canvas>
+		<canvas id="layer_brouillard" width="800" height="600"></canvas>
+		<canvas id="layer_brouillard2" width="800" height="600"></canvas>
+		<canvas id="layer_newbuild" width="800" height="600"></canvas>
 		
-		<canvas id="layer_cadre" width="800" height="400"></canvas>
+		<canvas id="layer_cadre" width="800" height="600"></canvas>
 
 		</div>	
 		<div id="menu">Or: 100 </div>
@@ -147,6 +155,8 @@
 		</div>
 
 		<div id="loading">Loading...</div>
+                
+                 
 
 	</body>
 </html>

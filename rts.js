@@ -3,6 +3,7 @@ var game;
 var map;
 var oGame;
 var oImages;
+var oSound;
 
 var widthCase=20;
 var heightCase=20;
@@ -11,7 +12,7 @@ var currentX=0;
 var currentY=0;
 
 var maxX=40;
-var maxY=20;
+var maxY=30;
 
 var QGx=10;
 var QGy=10;
@@ -38,16 +39,30 @@ function Images(){
 	this.tOImg=new Array();
 	this.tDetail=new Array();
 	this.counter=0;
+        this.total=0;
+	this.tSrc=Array();
 }
 Images.prototype={
-	load:function(src,idImg){
-		this.tOImg[idImg]=new Image();
-		this.tOImg[idImg].src=src;
-		this.tOImg[idImg].onload=function(){
-			oImages.counter++;
-			preload2();
-		}
-		//this.tOImg[idImg]=oImg;
+	add:function(src,idImg){
+	    this.tSrc[this.total]=Array();
+	    this.tSrc[this.total]['src']=src;
+	    this.tSrc[this.total]['idImg']=idImg;
+	    
+	    this.total++;
+	},
+	load:function(){
+	    
+		for(var i=0;i< this.total;i++){
+		    var idImg=this.tSrc[i]['idImg'];
+		    
+		    this.tOImg[idImg]=new Image();
+		    this.tOImg[idImg].src=this.tSrc[i]['src'];
+		    this.tOImg[idImg].onload=function(){
+			    oImages.counter++;
+			    preload2();
+		    };
+		    
+		}		
 	},
 	setDetailOnId:function(id,y,x,width,height,idImg){
 		this.tDetail[id]=new Array();
@@ -71,19 +86,21 @@ Images.prototype={
 		
 		oCanvasTmp.drawImage2(this.tOImg[ this.tDetail[id]['idImg'] ],this.tDetail[id]['x'],this.tDetail[id]['y'],this.tDetail[id]['width'],this.tDetail[id]['height'],x,y,width,height);
 		
-	},
+	}
 };
 
 function preload(){
 	
+        oSound=new Sound();
+        
 	oImages=new Images();
 	
 	var tDetailTmp=new Array();
 	tDetailTmp=[
-		['case-beige2','case-water','case-beige','case-wood'],
-		['unit-worker'],
-		['unit-soldier'],
-		['unit-archer'],
+		['case-beige2','case-water','case-beige','case-wood','case-bordHautGauche','case-bordHaut','case-bordDroite','case-bordGauche','case-bordBas'],
+		['unit-worker','unit-worker_attack','unit-worker_walking','unit-worker_walking2'],
+		['unit-soldier','unit-soldier_attack','unit-soldier_walking','unit-soldier_walking2'],
+		['unit-archer','unit-archer_attack','unit-archer_walking','unit-archer_walking2']
 	];
 	for(var y=0;y<tDetailTmp.length;y++){
 		for(var x=0;x<tDetailTmp[y].length;x++){
@@ -96,7 +113,7 @@ function preload(){
 		['build-QG','build-QG_-2','build-QG_-1'],
 		['build-ArcherHouse','build-ArcherHouse_-2','build-ArcherHouse_-1'],
 		
-		['build-mineOr'],
+		['build-mineOr']
 	];
 	for(var y=0;y<tDetailTmp.length;y++){
 		for(var x=0;x<tDetailTmp[y].length;x++){
@@ -104,17 +121,34 @@ function preload(){
 		}
 	}
 	
-	oImages.load('img3/sprite1x1.png','1x1');
-	oImages.load('img3/sprite2x2.png','2x2');
+	oImages.add('img3/sprite1x1.png','1x1');
+	oImages.add('img3/sprite2x2.png','2x2');
 	
+	
+        oSound.add('img3/attack.mp3','attack');
+        oSound.add('img3/building.mp3','building');
+        oSound.add('img3/dead.mp3','dead');
+        oSound.add('img3/wood.mp3','wood');
+        oSound.add('img3/mining.mp3','mining');
+	
+        
+	oImages.load();
+	
+	oSound.load();
 }
 
 function preload2(){
 	
-	if(oImages.counter < 2){
-		console.log('pas fini de charger :'+oImages.counter);
+	if(oImages.counter < oImages.total){
+		console.log('pas fini de charger images :'+oImages.counter+'/'+oImages.total);
 		return;
 	}
+        
+        if(oSound.counter < oSound.total){
+            console.log('pas fini de charger sons :'+oSound.counter+'/'+oSound.total);
+            return;
+            
+        }
 	
 	
 	
@@ -150,7 +184,7 @@ function preload2(){
 	
 	document.body.onkeyup=function (event){
 		oGame.keyup(event);
-	}
+	};
 	
 	setTimeout(load,1000);
 }
@@ -180,8 +214,8 @@ function load(){
 	var oUnit2 =new Unit('Soldier','green');
 	oUnit2.x=30;
 	oUnit2.y=9;
-	oUnit2.setCycle(10,7,40,9)
-	oUnit2.setTarget(10,7);
+	oUnit2.setCycle(14,7,40,9);
+	oUnit2.setTarget(14,7);
 	oUnit2.build();
 	oGame.tUnit.push(oUnit2);
 	
@@ -211,7 +245,7 @@ function load(){
 
 	//on affiche les zones réactives
 	//pour scroller la map avec la souris
-	oGame.drawDirection();
+	//oGame.drawDirection();
 
 	//on commencera la boucle de raffraichissement run() 
     //dans N secondes
@@ -244,7 +278,7 @@ function run(){
 		}
 		
 		//sinon on affiche les zones réactives
-		oGame.drawDirection();
+		//oGame.drawDirection();
 		
 		//on raffraichit les unités
 		oGame.refreshUnit();

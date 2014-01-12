@@ -12,6 +12,8 @@ function Game(){
 	this.buildcreation='';
 	//le tableau des cases visibles sur la carte
 	this.tVisible=Array();
+	//le tableau des cases enemies visibles sur la carte
+	this.tObscurity=Array();
 	//tableau contenant tous les batiments (utilisé pour reconstruire la map lors d'un scroll)
 	this.tBuild=Array();
 	//idem pour les unités
@@ -31,6 +33,8 @@ function Game(){
 	this.iWood=150;
 	
 	this.team='blue';
+        
+        this.oSound;
 }
 Game.prototype={
 	drawDirection:function(){
@@ -113,10 +117,14 @@ Game.prototype={
 			if(!this.tVisible[y+i]){
 				this.tVisible[y+i]=Array();
 			}
+			if(!this.tObscurity[y+i]){
+				this.tObscurity[y+i]=Array();
+			}
 			
 			for(var j=-2;j<3;j++){
 	
 				this.tVisible[y+i][x+j]=1;
+				this.tObscurity[y+i][x+j]=1;
 				
 				map.setVisibility(x+j,y+i);
 			}
@@ -188,7 +196,7 @@ Game.prototype={
 		return x;
 	},
 	getYApercu:function(e){
-		var y=this.getYmouse(e)-422;
+		var y=this.getYmouse(e)-622;
 		y=parseInt( y/map.miniWidth);
 		
 		return y;
@@ -223,13 +231,14 @@ Game.prototype={
 				var cycleFromX=QGx;
 				var cycleFromY=QGy;
 				
-				this.tSelected[i].setCycle(cycleToX,cycleToY,cycleFromX,cycleFromY);
+				this.tSelected[i].setCycle(cycleToX,cycleToY,cycleFromX,cycleFromY,aBuild.name);
 
 				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
 				this.tSelected[i].setTarget(cycleToX,cycleToY);
 			}
 		}else if(this.isWalkable(x,y) && this.tSelected.length){
 			for(var i=0;i <this.tSelected.length;i++){
+				this.tSelected[i].clearCycle();
 				//si la case est accessible, on y indique à l'unité d'y aller
 				this.tSelected[i].setTarget(x,y);
 			}
@@ -374,6 +383,17 @@ Game.prototype={
 		
 		this.tCoordBuild[y][x]='';
 	},
+	removeBuild:function(oBuild){
+		var tBuildTmp=Array();
+		for(var i=0;i<this.tBuild.length;i++){
+			if(this.tBuild[i].x != oBuild.x || this.tBuild[i].y != oBuild.y){
+				tBuildTmp.push(this.tBuild[i]);
+			}
+		}
+		this.tBuild=tBuildTmp;
+		
+		this.tCoordBuild[oBuild.y][oBuild.x]='';
+	},
 	getBuild:function(x,y){
 		if(this.tCoordBuild[y] &&  this.tCoordBuild[y][x]){
 			return this.tCoordBuild[y][x];
@@ -389,6 +409,17 @@ Game.prototype={
 		//console.log('saveUnit '+y+' '+x);
 		
 		//this.setVisibility(x,y);
+	},
+	removeUnit:function(oUnit){
+		var tUnitTmp=Array();
+		for(var i=0;i<this.tUnit.length;i++){
+			if(this.tUnit[i].x != oUnit.x || this.tUnit[i].y != oUnit.y){
+				tUnitTmp.push(this.tUnit[i]);
+			}
+		}
+		this.tUnit=tUnitTmp;
+		
+		this.tCoordUnit[oUnit.y][oUnit.x]='';
 	},
 	saveUnit:function(oUnit){
 		//on recupere les coordonnées de l'unité
@@ -482,27 +513,36 @@ Game.prototype={
 		getById('nav').innerHTML='';
 	},
 	refreshBuild:function(){
+            
 		for(var i=0;i< this.tBuild.length;i++){
 			var oBuild= this.tBuild[i];
 			if(oBuild.level < 0){
+                            
+                oBuild.animate('building')
+				oBuild.level++;    
+                           
+			}else if(oBuild.name!='wood' && oBuild.sSprite!=''){
+				oBuild.animate('normal');
 				
-				oBuild.sSprite='_'+oBuild.level;
-				oBuild.build();
-				oBuild.level++;
-			}else if(oBuild.sSprite!=''){
-				oBuild.sSprite='';
-				oBuild.build();
 			}
 		
 		}
+                
 	},
 	refreshUnit:function(){
 		
 		map.fillObscurity();
 		
+		for(var i=0;i< this.tBuild.length;i++){
+			if(this.team==this.tBuild[i].team){
+				this.tBuild[i].clearObscurity();
+			}
+		}
+		
 		//on boucle sur les unités existantes
 		for(var i=0;i< this.tUnit.length;i++){
 			var oUnit= this.tUnit[i];
+			oUnit.attack=0;
 			if(oUnit.life <=0){ continue;}
 			
 			if(this.team==oUnit.team){
@@ -511,6 +551,8 @@ Game.prototype={
 			
 			//si l'unité doit se rendre quelques part
 			if(oUnit.targetX!='' && oUnit.targetY!='' && (oUnit.targetX!=oUnit.x || oUnit.targetY!=oUnit.y) ){
+			
+				
 			
 				var vitesse=1;
 				var vitesse2=vitesse*-1;
@@ -540,8 +582,46 @@ Game.prototype={
 				//on verifie si aux coordonnées cible, il y a un batiment
 				var aBuild=this.getBuild(newX,newY);
 				
+				var iAttack=0;
+				//recherche si unité à porté d'attaque
+				var tAttak=[
+							[-1,-1],
+							[0,-1],
+							[1,-1],
+							
+							[-1,0],
+							[1,0],
+							
+							[-1,+1],
+							[0,+1],
+							[1,+1],
+				];
+				for(var j=0;j<tAttak.length;j++){
+					var oUnit2=this.getUnit(oUnit.x+tAttak[j][0],oUnit.y+tAttak[j][1]);
+					//si unité enemie
+					if(oUnit2 && oUnit2.team!=oUnit.team){
+						oUnit.animate('attack');
+						oUnit2.animate('attack');
+						iAttack=1;       
+						break;
+					}
+				}
+                                	
+				if(iAttack){              
+					//on decremente l'enemie de la puissance d'attaque
+					oUnit2.life-=oUnit.attak;
+					if(oUnit2.life <=0){
+						oUnit.animate('walking');
+                        oUnit2.animate('dead');      
+						//si unite dead, on l'efface du jeu
+						oUnit2.clear();
+						oGame.removeUnit(oUnit2);
+						
+						
+                                                
+					}
 				//si la cible est le QG et que l'on est en "ronde"
-				if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
+				}else if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
 					oUnit.x=newX;
 					oUnit.y=newY;
 					
@@ -564,6 +644,8 @@ Game.prototype={
 				//si la cible c'est un arbre et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8  && oUnit.cycleToX!=''){
 					
+					oUnit.animate('wood');
+                                        
 					//on met en place un compteur 
 					//pour que la ressources mette du temps
 					//a recuperer la ressource
@@ -583,19 +665,44 @@ Game.prototype={
 					//si l'arbre est épuisé, on le supprime de la carte
 					if(aBuild.ressource<=0){
 						aBuild.clear();
+						oGame.removeBuild(aBuild);
+						
+						//on définit un nouvel arbre à prendre en compte
+						var tWood=[
+							[-1,-1],
+							[0,-1],
+							[1,-1],
+							
+							[-1,0],
+							[1,0],
+							
+							[-1,+1],
+							[0,+1],
+							[1,+1],
+						];
+						for(var i=0;i<tWood.length;i++){
+							var oBuild2=this.getBuild(aBuild.x+tWood[i][0],aBuild.y+tWood[i][1]);
+							if(oBuild2 && oBuild2.name=='wood'){
+								oUnit.cycleToX=oBuild2.x;
+								oUnit.cycleToY=oBuild2.y;
+								
+								break;
+							}
+						}
 					}
-					
-					oUnit.x=newX;
-					oUnit.y=newY;
 					
 					//on remet le compteur à 0
 					oUnit.counter=0;
 					
 					//on redéfinit la nouvelle cible (c'est un cycle)
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
+                                        
+                    oUnit.animate('walking');
 				
 				//si la cible c'est une mine d'or et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='or' && oUnit.counter < 8  && oUnit.cycleToX!=''){
+                                    
+                    oUnit.animate('mining');
 					//on met en place un compteur 
 					//pour que la ressources mette du temps
 					//a recuperer la ressource
@@ -615,6 +722,8 @@ Game.prototype={
 					
 					//on redéfinit la nouvelle cible (c'est un cycle)
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
+                                        
+                    oUnit.animate('walking');
 					
 				}else if(this.checkCoord(newX,newY)){
 					//si la coordonnées est libre
@@ -639,92 +748,73 @@ Game.prototype={
 				
 				//on dessine l'unité
 				oUnit.build();
+				oUnit.animate('walking');
 				
-				//si la position n'est pas differente d'avant le calcul: l'unite est bloque, on annule sa cible
-				if(lastX==oUnit.x && lastY==oUnit.y){
-					//oUnit.clearTarget();
-				}
-				
-				console.log('recalcul');
+				//console.log('recalcul');
 				//on met à jour la partie visible de la carte
 				oGame.displayVisibility();
 			}else if(oUnit.cycleFromX!='' && (oUnit.targetX==oUnit.x || oUnit.targetY==oUnit.y) ){
+				
 				//si arrivee a destination et cycle 
-				if(oUnit.cycleFromX==oUnit.x && oUnit.cycleFromY==oUnit.y ){
+				
+				if(oUnit.cycleObject=='wood'){
+					oUnit.clearCycle();
+				}else if(oUnit.cycleFromX==oUnit.x && oUnit.cycleFromY==oUnit.y ){
 					oUnit.setTarget(oUnit.cycleToX,oUnit.cycleToY);
 				}else{
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
 				}
+			}else{
+				
+				oUnit.animate('stand');
+				
 			}
 		
-			//recherche si unité à porté d'attaque
-			var tAttak=[
-						[-1,-1],
-						[0,-1],
-						[1,-1],
-						
-						[-1,0],
-						[1,0],
-						
-						[-1,+1],
-						[0,+1],
-						[1,+1],
-			];
-			for(var j=0;j<tAttak.length;j++){
-				var oUnit2=this.getUnit(oUnit.x+tAttak[j][0],oUnit.y+tAttak[j][1]);
-				//si unité enemie
-				if(oUnit2 && oUnit2.team!=oUnit.team){
-					//on decremente l'enemie de la puissance d'attaque
-					oUnit2.life-=oUnit.attak;;
-					if(oUnit2.life <=0){
-						//si unite dead, on l'efface du jeu
-						oUnit2.clear();
-					}
-					break;
-				}
-			}
-		
-		
-			//recherche si unité adverse à proximitée
-			var tMove=[
-						[-2,-2],
-						[-1,-2],
-						[0,-2],
-						[1,-2],
-						[2,-2],
 			
-						[-2,-1],
-						[-1,-1],
-						[0,-1],
-						[1,-1],
-						[2,-1],
-						
-						[-2,0],
-						[-1,0],
-						[1,0],
-						[2,0],
-						
-						
-						[-2,+1],
-						[-1,+1],
-						[0,+1],
-						[1,+1],
-						[2,+1],
-						
-						[-2,+2],
-						[-1,+2],
-						[0,+2],
-						[1,+2],
-						[2,+2],
-			];
-			for(var j=0;j<tMove.length;j++){
-				var oUnit2=this.getUnit(oUnit.x+tMove[j][0],oUnit.y+tMove[j][1]);
-				//si unité enemie
-				if(oUnit2 && oUnit2.team!=oUnit.team){
-					//l'unité se rapproche pour attaquer
-					oUnit.setTarget(oUnit2.x,oUnit2.y)
-					break;
+			
+			if(oUnit && oUnit.team!=this.team){
+				//recherche si unité adverse à proximitée
+				var tMove=[
+							[-2,-2],
+							[-1,-2],
+							[0,-2],
+							[1,-2],
+							[2,-2],
+				
+							[-2,-1],
+							[-1,-1],
+							[0,-1],
+							[1,-1],
+							[2,-1],
+							
+							[-2,0],
+							[-1,0],
+							[1,0],
+							[2,0],
+							
+							
+							[-2,+1],
+							[-1,+1],
+							[0,+1],
+							[1,+1],
+							[2,+1],
+							
+							[-2,+2],
+							[-1,+2],
+							[0,+2],
+							[1,+2],
+							[2,+2],
+				];
+				for(var j=0;j<tMove.length;j++){
+					var oUnit2=this.getUnit(oUnit.x+tMove[j][0],oUnit.y+tMove[j][1]);
+					//si unité enemie
+					if(oUnit2 && oUnit2.team!=oUnit.team){
+						//l'unité se rapproche pour attaquer
+						oUnit.setTarget(oUnit2.x,oUnit2.y);
+						break;
+					}
 				}
+				
 			}
 			
 		}
@@ -768,7 +858,7 @@ Game.prototype={
 			this.buildcreation.y=y;
 			//on affiche le plan
 			this.buildcreation.build();
-		}else if(this.mouseY < 5){
+		/*}else if(this.mouseY < 5){
 			//si les coordonnées y sont inferieur à 5: 
 			//scroll de la map vers le haut
 			sDirection='up';
@@ -784,7 +874,7 @@ Game.prototype={
 		}else if(this.mouseX > (oLayer_map.width-10)){
 			//si les coordonnées x sont superieur à la largeur de la map -10: 
 			//scroll de la map vers la droite
-			sDirection='right';
+			sDirection='right';*/
 		}else if(this.mouseX > 0 && this.mouseX < oLayer_map.width && this.mouseY > 0 && this.mouseY < oLayer_map.height){
 			this.onMouseOver=1;
 		}
@@ -806,12 +896,18 @@ Game.prototype={
 		var a=getById('menu');
 		if(a){
 			var sHtml='';
-			sHtml+='<span style="background:yellow;padding:0px 4px">&nbsp;</span>';
+			sHtml+='<span style="border:2px solid #444;background:yellow;padding:0px 4px">&nbsp;</span>';
 			sHtml+=' Or: '+this.iOr;
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
-			sHtml+='<span style="background:brown;padding:0px 4px">&nbsp;</span>';
+			sHtml+='<span style="border:2px solid #444;background:brown;padding:0px 4px">&nbsp;</span>';
 			sHtml+=' Bois: '+this.iWood;
+			
+			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
+			
 			a.innerHTML=sHtml;
+			
 		}
-	},
+	}
+        
+        
 };
