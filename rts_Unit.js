@@ -94,11 +94,24 @@ Unit.prototype={
 			tmpImg=this.idImg+'_attack';
 			this.playSound('attack',this.action);
 		}else if(action=='walking'){
-			if(this.tmpIdImg==this.idImg+'_walking2'){
-				tmpImg=this.idImg+'_walking';
+			
+			var sDirection='';
+			if(this.targetY < this.y){
+				sDirection='Up';
+			}else if(this.targetY > this.y){
+				sDirection='Down';
+			}else if(this.targetX > this.x){
+				sDirection='Right';
 			}else{
-				tmpImg=this.idImg+'_walking2';
+				sDirection='Left';
 			}
+			
+			if(this.tmpIdImg==this.idImg+'_walking2'){
+				tmpImg=this.idImg+'_walking'+sDirection;
+			}else{
+				tmpImg=this.idImg+'_walking2'+sDirection;
+			}
+			
 			this.stopSound();
 			this.tmpIdImg=tmpImg;
 		}else if(action=='dead'){
@@ -144,9 +157,10 @@ Unit.prototype={
 			this.buildOnY='';
 			this.oBuildOn='';
 			
-			//on décrément la ressource or
-			oGame.iOr-=aBuild.costOr;
-			oGame.iWood-=aBuild.costWood;
+			//on décrément la ressource or et bois
+			oGame.useRessource(this.team,'or',aBuild.costOr);
+			oGame.useRessource(this.team,'wood',aBuild.costWood);
+			
 			//on réactualise les ressources
 			oGame.buildRessource();
 			//on reset la sélection
@@ -209,7 +223,24 @@ Unit.prototype={
 		
 		sHtml+='<h1>'+this.shortname+'</h1>';
 		
-		sHtml+='<p style="color:white"><img src="'+this.src+'"><strong>Vie:</strong> '+this.life+'</p>';			
+		sHtml+='<table><tr>';
+			sHtml+='<td style="color:white"><img src="'+this.src+'"></br/>';
+			sHtml+='<strong>Vie:</strong> '+this.life+'';
+			sHtml+='</td>';
+		
+			if(this.name='Worker'){
+				sHtml+='<td style="color:white">';
+					sHtml+='<h1>Ressources transpor&eacute;es</h1>';
+					sHtml+='<span style="border:1px solid gray;background:yellow">&nbsp;&nbsp;&nbsp;&nbsp;</span> ';
+					sHtml+=this.or;
+					
+					sHtml+='<span style="padding-left:30px">&nbsp;</span>';
+					
+					sHtml+='<span style="border:1px solid gray;background:brown">&nbsp;&nbsp;&nbsp;&nbsp;</span> ';
+					sHtml+=this.wood;
+				sHtml+='</td>';
+			}
+		sHtml+='</tr></table>';			
 		
 		if(this.tBuildCreation.length){
 			

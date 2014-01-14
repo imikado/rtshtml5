@@ -128,7 +128,7 @@ Build.prototype={
 			
 			sHtml+='<td>';
 			
-			if(oGame.iOr > this.unitCreation.costOr){ 
+			if(oGame.getRessource(this.team,'or') > this.unitCreation.costOr){ 
 	
 			
 				sImg='<input class="btnImage" type="image" src="'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/>';
@@ -160,7 +160,7 @@ Build.prototype={
 	},
 	createUnit:function(){
 		
-		oGame.iOr-=this.unitCreation.costOr;
+		oGame.useRessource(this.unitCreation.team,'or',this.unitCreation.costOr);
 		oGame.buildRessource();
 		
 		var oUnit;

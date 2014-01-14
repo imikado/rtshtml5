@@ -98,9 +98,56 @@ function preload(){
 	var tDetailTmp=new Array();
 	tDetailTmp=[
 		['case-beige2','case-water','case-beige','case-wood','case-bordHautGauche','case-bordHaut','case-bordDroite','case-bordGauche','case-bordBas'],
-		['unit-worker','unit-worker_attack','unit-worker_walking','unit-worker_walking2'],
-		['unit-soldier','unit-soldier_attack','unit-soldier_walking','unit-soldier_walking2'],
-		['unit-archer','unit-archer_attack','unit-archer_walking','unit-archer_walking2']
+		[
+			'unit-worker',
+			'unit-worker_attack',
+			
+			'unit-worker_walkingRight',
+			'unit-worker_walking2Right',
+			
+			'unit-worker_walkingLeft',
+			'unit-worker_walking2Left',
+			
+			'unit-worker_walkingDown',
+			'unit-worker_walking2Down',
+			
+			'unit-worker_walkingUp',
+			'unit-worker_walking2Up'
+			
+		],
+		[
+			'unit-soldier',
+			'unit-soldier_attack',
+			
+			'unit-soldier_walkingRight',
+			'unit-soldier_walking2Right',
+			
+			'unit-soldier_walkingLeft',
+			'unit-soldier_walking2Left',
+			
+			'unit-soldier_walkingDown',
+			'unit-soldier_walking2Down',
+			
+			'unit-soldier_walkingUp',
+			'unit-soldier_walking2Up'
+			
+		],
+		[
+			'unit-archer',
+			'unit-archer_attack',
+			
+			'unit-archer_walkingRight',
+			'unit-archer_walking2Right',
+			
+			'unit-archer_walkingLeft',
+			'unit-archer_walking2Left',
+			
+			'unit-archer_walkingDown',
+			'unit-archer_walking2Down',
+			
+			'unit-archer_walkingUp',
+			'unit-archer_walking2Up'
+		]
 	];
 	for(var y=0;y<tDetailTmp.length;y++){
 		for(var x=0;x<tDetailTmp[y].length;x++){
@@ -164,7 +211,7 @@ function preload2(){
 	oLayer_buildingcreation.ctx.globalAlpha=0.9;
 	
 	oLayer_brouillard=new Canvas('layer_brouillard');
-	oLayer_brouillard.ctx.globalAlpha=0.9;
+	oLayer_brouillard.ctx.globalAlpha=1;
 	
 	oLayer_brouillard2=new Canvas('layer_brouillard2');
 	oLayer_brouillard2.ctx.globalAlpha=0.5;
@@ -175,7 +222,7 @@ function preload2(){
 	oLayer_apercuCadre=new Canvas('layer_apercuCadre');
 	oLayer_apercuBuild=new Canvas('layer_apercuBuild');
 	oLayer_apercuBrouillard=new Canvas('layer_apercuBrouillard');
-	oLayer_apercuBrouillard.ctx.globalAlpha=0.9;
+	oLayer_apercuBrouillard.ctx.globalAlpha=1;
 	
 	
 	oGame=new Game();

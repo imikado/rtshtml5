@@ -28,13 +28,16 @@ function Game(){
 	this.mouseX='';
 	this.mouseY='';
 	
-	//ressources
-	this.iOr=250;
-	this.iWood=150;
-	
 	this.team='blue';
-        
-        this.oSound;
+    
+    //ressources
+    this.tRessource=Array();
+    this.tRessource[this.team]=Array();
+    this.tRessource[this.team]['or']=250;
+    this.tRessource[this.team]['wood']=150;
+    
+    
+    this.oSound;
 }
 Game.prototype={
 	drawDirection:function(){
@@ -236,6 +239,17 @@ Game.prototype={
 				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
 				this.tSelected[i].setTarget(cycleToX,cycleToY);
 			}
+		}else if(this.tSelected.length && aBuild && ( aBuild.name=='QG' )){	
+			
+			for(var i=0;i<this.tSelected.length;i++){
+				//si une des unités séléctionné transporte une ressource
+				if(this.tSelected[i].or || this.tSelected[i].wood){
+					//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
+					this.tSelected[i].setTarget(aBuild.x,aBuild.y);
+				}
+
+			}
+
 		}else if(this.isWalkable(x,y) && this.tSelected.length){
 			for(var i=0;i <this.tSelected.length;i++){
 				this.tSelected[i].clearCycle();
@@ -626,15 +640,35 @@ Game.prototype={
 					//si l'unité transportait de l'or
 					if(oUnit.or >0){
 						//on ajoute une ressource or
-						this.addRessourceOr(oUnit.or);
+						this.addRessource(oUnit.team,'or',oUnit.or);
 					}else 	if(oUnit.wood >0){
 						//idem pour le bois
-						this.addRessourceWood(oUnit.wood);
+						this.addRessource(oUnit.team,'wood',oUnit.wood);
 					}
 
 					//on reset les ressources de l'unité
 					oUnit.or=0;
 					oUnit.wood=0;
+					
+					oUnit.buildNav();
+				
+				//si hors cycle mais que l'on demande à une unité de se rendre au QG pour vider ses poches
+				}else if(aBuild && aBuild.name=='QG' && (oUnit.or || oUnit.wood)){
+				
+					//si l'unité transportait de l'or
+					if(oUnit.or >0){
+						//on ajoute une ressource or
+						this.addRessource(oUnit.team,'or',oUnit.or);
+					}else 	if(oUnit.wood >0){
+						//idem pour le bois
+						this.addRessource(oUnit.team,'wood',oUnit.wood);
+					}
+
+					//on reset les ressources de l'unité
+					oUnit.or=0;
+					oUnit.wood=0;
+					
+					oUnit.buildNav();
 				
 				//si la cible c'est un arbre et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8  && oUnit.cycleToX!=''){
@@ -654,6 +688,7 @@ Game.prototype={
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter >= 8 && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.wood=10;
+					oUnit.buildNav();
 					
 					//a chaque iteration on decremente la ressource
 					aBuild.ressource-=10;
@@ -708,6 +743,7 @@ Game.prototype={
 				}else if(aBuild && aBuild.name=='or' && oUnit.counter >= 8  && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.or=10;
+					oUnit.buildNav();
 					
 					oUnit.x=newX;
 					oUnit.y=newY;
@@ -876,15 +912,18 @@ Game.prototype={
 		}
 		
 	},
-	addRessourceOr:function(nb){
-		this.iOr+=nb;
+	addRessource:function(team,ressource,nb){
+		this.tRessource[team][ressource]+=nb;
 		this.buildRessource();
 	},
-	addRessourceWood:function(nb){
-		this.iWood+=nb;
+	useRessource:function(team,ressource,nb){
+		this.tRessource[team][ressource]-=nb;
 		this.buildRessource();
 	},
-	 
+	getRessource:function(team,ressource){
+		return this.tRessource[team][ressource];
+	},
+	
 	mouseout:function(){
 		this.onMouseOver=0;
 	},
@@ -893,10 +932,10 @@ Game.prototype={
 		if(a){
 			var sHtml='';
 			sHtml+='<span style="border:2px solid #444;background:yellow;padding:0px 4px">&nbsp;</span>';
-			sHtml+=' Or: '+this.iOr;
+			sHtml+=' Or: '+this.getRessource(this.team,'or');
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
 			sHtml+='<span style="border:2px solid #444;background:brown;padding:0px 4px">&nbsp;</span>';
-			sHtml+=' Bois: '+this.iWood;
+			sHtml+=' Bois: '+this.getRessource(this.team,'wood');
 			
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
 			
