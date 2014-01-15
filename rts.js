@@ -11,8 +11,8 @@ var heightCase=20;
 var currentX=0;
 var currentY=0;
 
-var maxX=40;
-var maxY=30;
+var maxX=800/widthCase;
+var maxY=600/heightCase;
 
 var QGx=10;
 var QGy=10;

@@ -85,6 +85,12 @@ Unit.prototype={
 		this.oAudio.pause();
 		//this.oAudio.currentTime=0;
 	},
+	getX:function(){
+		return parseInt(this.x);
+	},
+	getY:function(){
+		return parseInt(this.y);
+	},
 	animate:function(action){
 
 		oLayer_perso.clearRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2);
@@ -106,7 +112,7 @@ Unit.prototype={
 				sDirection='Left';
 			}
 			
-			if(this.tmpIdImg==this.idImg+'_walking2'){
+			if(this.tmpIdImg==this.idImg+'_walking2'+sDirection){
 				tmpImg=this.idImg+'_walking'+sDirection;
 			}else{
 				tmpImg=this.idImg+'_walking2'+sDirection;
@@ -136,7 +142,7 @@ Unit.prototype={
 		oImages.drawImageOnLayer(this.idImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
 		
 		//si l'unité doit construire un batiment, et qu'elle se trouve sur les lieux de la construction
-		if(this.oBuildOn && this.x+1==this.oBuildOn.x && this.y==this.oBuildOn.y){
+		if(this.oBuildOn && this.getX()+1==this.oBuildOn.x && this.getY()==this.oBuildOn.y){
 			
 			//création du batiment à l'emplacement
 			var aBuild=new Build(this.oBuildOn.name,this.team);

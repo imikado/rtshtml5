@@ -409,6 +409,9 @@ Game.prototype={
 		this.tCoordBuild[oBuild.y][oBuild.x]='';
 	},
 	getBuild:function(x,y){
+		y=parseInt(y);
+		x=parseInt(x);
+		
 		if(this.tCoordBuild[y] &&  this.tCoordBuild[y][x]){
 			return this.tCoordBuild[y][x];
 		}
@@ -416,8 +419,8 @@ Game.prototype={
 	},
 	clearUnit:function(oUnit){
 		
-		var y=oUnit.y;
-		var x=oUnit.x;
+		var y=oUnit.getY();
+		var x=oUnit.getX();
 		
 		this.tCoordUnit[y][x]='';
 		//console.log('saveUnit '+y+' '+x);
@@ -427,18 +430,18 @@ Game.prototype={
 	removeUnit:function(oUnit){
 		var tUnitTmp=Array();
 		for(var i=0;i<this.tUnit.length;i++){
-			if(this.tUnit[i].x != oUnit.x || this.tUnit[i].y != oUnit.y){
+			if(this.tUnit[i].getX() != oUnit.getX() || this.tUnit[i].getY() != oUnit.getY()){
 				tUnitTmp.push(this.tUnit[i]);
 			}
 		}
 		this.tUnit=tUnitTmp;
 		
-		this.tCoordUnit[oUnit.y][oUnit.x]='';
+		this.tCoordUnit[oUnit.getY()][oUnit.getX()]='';
 	},
 	saveUnit:function(oUnit){
 		//on recupere les coordonnées de l'unité
-		var y=oUnit.y;
-		var x=oUnit.x;
+		var y=oUnit.getY();
+		var x=oUnit.getX();
 		
 		//on enregistre dans un tableau indexé
 		//les nouvelles coordonnées
@@ -577,7 +580,7 @@ Game.prototype={
 						[1,+1],
 			];
 			for(var j=0;j<tAttak.length;j++){
-				var oUnit2=this.getUnit(oUnit.x+tAttak[j][0],oUnit.y+tAttak[j][1]);
+				var oUnit2=this.getUnit(oUnit.getX()+tAttak[j][0],oUnit.getY()+tAttak[j][1]);
 				//si unité enemie
 				if(oUnit2 && oUnit2.team!=oUnit.team){
 					iAttack=1;       
@@ -600,9 +603,9 @@ Game.prototype={
 
 				}
 				//si l'unité doit se rendre quelques part
-			}else if(oUnit.targetX!='' && oUnit.targetY!='' && (oUnit.targetX!=oUnit.x || oUnit.targetY!=oUnit.y) ){
+			}else if(oUnit.targetX!='' && oUnit.targetY!='' && (oUnit.targetX!=oUnit.getX() || oUnit.targetY!=oUnit.getY() ) ){
 			
-				var vitesse=1;
+				var vitesse=0.5;
 				var vitesse2=vitesse*-1;
 				
 				//on efface le dessin sur le calques
@@ -616,14 +619,14 @@ Game.prototype={
 				var newY=oUnit.y;
 				
 				//on fait evoluer les coordonnées vers la destination
-				if(oUnit.targetX!='' && oUnit.x < oUnit.targetX ){
+				if(oUnit.targetX!='' && oUnit.getX() < oUnit.targetX ){
 					newX+=vitesse;
-				}else if(oUnit.targetX!='' && oUnit.x > oUnit.targetX ){
+				}else if(oUnit.targetX!='' && oUnit.getX() > oUnit.targetX ){
 					newX-=vitesse;
 				}
-				if(oUnit.targetY!='' && oUnit.y < oUnit.targetY ){
+				if(oUnit.targetY!='' && oUnit.getY() < oUnit.targetY ){
 					newY+=vitesse;
-				}else if(oUnit.targetY!='' && oUnit.y > oUnit.targetY ){
+				}else if(oUnit.targetY!='' && oUnit.getY() > oUnit.targetY ){
 					newY-=vitesse;
 				}
 				
@@ -784,14 +787,14 @@ Game.prototype={
 				//console.log('recalcul');
 				//on met à jour la partie visible de la carte
 				oGame.displayVisibility();
-			}else if(oUnit.cycleFromX!='' && (oUnit.targetX==oUnit.x || oUnit.targetY==oUnit.y) ){
+			}else if(oUnit.cycleFromX!='' && (oUnit.targetX==oUnit.getX() || oUnit.targetY==oUnit.getY() ) ){
 				
 				//si arrivee a destination et cycle 
 				oUnit.animate('stand');
 				
 				if(oUnit.cycleObject=='wood'){
 					oUnit.clearCycle();
-				}else if(oUnit.cycleFromX==oUnit.x && oUnit.cycleFromY==oUnit.y ){
+				}else if(oUnit.cycleFromX==oUnit.getX() && oUnit.cycleFromY==oUnit.getY() ){
 					oUnit.setTarget(oUnit.cycleToX,oUnit.cycleToY);
 				}else{
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
@@ -838,11 +841,11 @@ Game.prototype={
 							[2,+2],
 				];
 				for(var j=0;j<tMove.length;j++){
-					var oUnit2=this.getUnit(oUnit.x+tMove[j][0],oUnit.y+tMove[j][1]);
+					var oUnit2=this.getUnit(oUnit.getX()+tMove[j][0],oUnit.getY()+tMove[j][1]);
 					//si unité enemie
 					if(oUnit2 && oUnit2.team!=oUnit.team){
 						//l'unité se rapproche pour attaquer
-						oUnit.setTarget(oUnit2.x,oUnit2.y);
+						oUnit.setTarget(oUnit2.getX(),oUnit2.getY() );
 						break;
 					}
 				}
