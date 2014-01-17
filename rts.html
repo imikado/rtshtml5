@@ -29,7 +29,7 @@
 		position:absolute;
 		top:0px;
 		left:0px;
-		width:800px;
+		width:900px;
 		height:800px;
 		background:#000000;
 		color:white;
@@ -39,7 +39,7 @@
 	#layer_map, #layer_building, #layer_perso, #layer_select, #layer_newbuild, #layer_brouillard, #layer_brouillard2,#layer_cadre, #layer_cursor{
 		position:absolute;
 		top:0px;
-		width:800px;
+		width:900px;
 		height:600px;
 	}
 	#layer_map{
@@ -49,13 +49,13 @@
 		position:absolute;
 		top:0px;
 		left:0px;
-		width:800px;
+		width:900px;
 		height:600px;
                 border-right:1px solid white;
 	}
 	#menu{
 		position:absolute;
-		width:800px;
+		width:900px;
 		top:600px;
 		left:0px;
 		height:20px;
@@ -70,7 +70,7 @@
 		position:absolute;
 		top:620px;
 		left:0px;
-		width:780px;
+		width:880px;
 		height:244px;
 		background:#222;
 		padding:10px;
@@ -99,7 +99,7 @@
 	#layer_apercu,#layer_apercuCadre,#layer_apercuBuild,#layer_apercuBrouillard{
 		position:absolute;
 		top:622px;
-		left:600px;
+		left:700px;
 		border:1px solid white;
 	}
 	#layer_apercu{
@@ -124,6 +124,12 @@
 	.curseur input{
 		margin:0px;
 	}
+	#sound{
+		position:absolute;
+		top:830px;
+		left:700px;
+		color:white;
+	}
 	 
 	</style>
 	
@@ -131,17 +137,17 @@
 	<body onload="preload()" onkeydown="oGame.keydown(event)">
 
 		<div id="content" onmousemove="oGame.mousemove(event)" onmouseout="oGame.mouseout()" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
-		<canvas id="layer_map" width="800" height="600"></canvas>
-		<canvas id="layer_building" width="800" height="600"></canvas>
-		<canvas id="layer_perso" width="800" height="600"></canvas>
-		<canvas id="layer_select" width="800" height="600"></canvas>
-		<canvas id="layer_cursor" width="800" height="600"></canvas>
+		<canvas id="layer_map" width="900" height="600"></canvas>
+		<canvas id="layer_building" width="900" height="600"></canvas>
+		<canvas id="layer_perso" width="900" height="600"></canvas>
+		<canvas id="layer_select" width="900" height="600"></canvas>
+		<canvas id="layer_cursor" width="900" height="600"></canvas>
 		
-		<canvas id="layer_brouillard" width="800" height="600"></canvas>
-		<canvas id="layer_brouillard2" width="800" height="600"></canvas>
-		<canvas id="layer_newbuild" width="800" height="600"></canvas>
+		<canvas id="layer_brouillard" width="900" height="600"></canvas>
+		<canvas id="layer_brouillard2" width="900" height="600"></canvas>
+		<canvas id="layer_newbuild" width="900" height="600"></canvas>
 		
-		<canvas id="layer_cadre" width="800" height="600"></canvas>
+		<canvas id="layer_cadre" width="900" height="600"></canvas>
 
 		</div>	
 		<div id="menu">Or: 100 </div>
@@ -156,7 +162,7 @@
 
 		<div id="loading">Loading...</div>
                 
-                 
+        <div id="sound"><input checked="checked" type="checkbox" id="soundEnabled" onclick="oGame.switchSound(this)"> Son</div>
 
 	</body>
 </html>

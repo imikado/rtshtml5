@@ -52,7 +52,24 @@ function Build(name,team){
 		this.costWood=50;
 		
 		this.unitCreation =new Unit('Archer',this.team);
+	}else if(this.name=='Houblon'){
+		this.shortname='Houblon';
+		this.src='img3/case-houblon.png';
+		this.idImg='case-houblon';
+		
+		this.costOr=10;
+		this.costWood=10;
+		
+	}else if(this.name=='Brasserie'){
+		this.shortname='Brasserie';
+		this.src='img3/build-brasserie.png';
+		this.idImg='build-brasserie';
+		
+		this.costOr=200;
+		this.costWood=50;
 	}
+	
+	
 	
 }
 Build.prototype={
@@ -128,7 +145,7 @@ Build.prototype={
 			
 			sHtml+='<td>';
 			
-			if(oGame.getRessource(this.team,'or') > this.unitCreation.costOr){ 
+			if(oGame.getRessource(this.team,'or') >= this.unitCreation.costOr){ 
 	
 			
 				sImg='<input class="btnImage" type="image" src="'+this.unitCreation.src+'" onclick="oGame.getBuild('+(this.x)+','+(this.y)+').createUnit()" class="btn" value="createUnit"/>';
@@ -246,3 +263,4 @@ Wood.prototype={
 		console.log('ICI on supprime l arbre y:'+this.y+' x:'+this.x);
 	}
 };
+

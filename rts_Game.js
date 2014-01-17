@@ -35,11 +35,26 @@ function Game(){
     this.tRessource[this.team]=Array();
     this.tRessource[this.team]['or']=250;
     this.tRessource[this.team]['wood']=150;
+    this.tRessource[this.team]['beer']=20;
     
+    this.bSound=1;
     
     this.oSound;
 }
 Game.prototype={
+	switchSound:function(object){
+		if(object.checked){
+			this.enableSound();
+		}else{
+			this.disableSound();
+		}
+	},
+	enableSound:function(){
+		this.bSound=1;
+	},
+	disableSound:function(){
+		this.bSound=0;
+	},
 	drawDirection:function(){
 		oLayer_cadre.clear();
 		//left
@@ -193,7 +208,7 @@ Game.prototype={
 	},
 	
 	getXApercu:function(e){
-		var x=this.getXmouse(e)-600;
+		var x=this.getXmouse(e)-700;
 		x=parseInt( x/map.miniWidth);
 	
 		return x;
@@ -220,7 +235,7 @@ Game.prototype={
 		var aBuild=this.getBuild(x,y);
 
 		//si une unité est sélectionnée et que le batiment cliqué est une mine ou du bois
-		if(this.tSelected.length && aBuild && ( aBuild.name=='or' || aBuild.name=='wood' )){
+		if(this.tSelected.length && aBuild && ( aBuild.name=='or' || aBuild.name=='wood'  )){
 			//on créé une ronde du bois/or vers le QG
 			//pour alimenter les ressources Or/bois
 			
@@ -239,6 +254,36 @@ Game.prototype={
 				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
 				this.tSelected[i].setTarget(cycleToX,cycleToY);
 			}
+		}else if(this.tSelected.length && aBuild && ( aBuild.name=='Houblon')){
+			//on créé une ronde du bois/or vers le QG
+			//pour alimenter les ressources Or/bois
+			
+			for(var i=0;i<this.tSelected.length;i++){
+			
+				//on indique que la destination de cycle c'est la mine d'or ou l'arbre
+				var cycleToX=x;
+				var cycleToY=y;
+
+				//on indique que la provenance du cycle c'est la brasserie
+				var cycleFromX=-1;
+				var cycleFromY=-1;
+				
+				for(var j=0;j< this.tBuild.length;j++){
+					if(this.tBuild[j].name=='Brasserie'){
+						cycleFromX=this.tBuild[j].x;
+						cycleFromY=this.tBuild[j].y;
+					}
+				}
+				
+				if(cycleFromX < 0){
+					alert('Il vous manque une brasserie');
+				}
+				
+				this.tSelected[i].setCycle(cycleToX,cycleToY,cycleFromX,cycleFromY,aBuild.name);
+
+				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
+				this.tSelected[i].setTarget(cycleToX,cycleToY);
+			}	
 		}else if(this.tSelected.length && aBuild && ( aBuild.name=='QG' )){	
 			
 			for(var i=0;i<this.tSelected.length;i++){
@@ -281,8 +326,8 @@ Game.prototype={
 		var x=this.getXApercu(e);
 		var y=this.getYApercu(e);
 		
-		currentX=x-(maxX/2);
-		currentY=y-(maxY/2);
+		currentX=x-(10);
+		currentY=y-(10);
 		
 		if(currentX < 0 ){ currentX=0;}
 		if(currentY < 0 ){ currentY=0;}
@@ -588,7 +633,10 @@ Game.prototype={
 				}
 			}
 
-			if(iAttack){    
+			if(iAttack && this.getRessource(oUnit.team,'beer') > oUnit.costBeer ){    
+
+				this.useRessource(oUnit.team,'beer',oUnit.costBeer);
+				this.buildRessource();
 
 				oUnit.animate('attack');
 
@@ -633,7 +681,23 @@ Game.prototype={
 				//on verifie si aux coordonnées cible, il y a un batiment
 				var aBuild=this.getBuild(newX,newY);
 				
-				if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
+				if(aBuild && aBuild.name=='Brasserie' && oUnit.cycleToX!=''){
+					oUnit.x=newX;
+					oUnit.y=newY;
+					
+					//on definit la nouvelle cible
+					oUnit.setTarget(oUnit.cycleToX,oUnit.cycleToY);
+					
+					//si l'unité transportait de l'or
+					if(oUnit.houblon >0){
+						//on ajoute une ressource or
+						this.addRessource(oUnit.team,'beer',oUnit.houblon);
+					}
+
+					//on reset les ressources de l'unité
+					oUnit.houblon=0;
+					
+				}else if(aBuild && aBuild.name=='QG' && oUnit.cycleToX!=''){
 					oUnit.x=newX;
 					oUnit.y=newY;
 					
@@ -653,7 +717,6 @@ Game.prototype={
 					oUnit.or=0;
 					oUnit.wood=0;
 					
-					oUnit.buildNav();
 				
 				//si hors cycle mais que l'on demande à une unité de se rendre au QG pour vider ses poches
 				}else if(aBuild && aBuild.name=='QG' && (oUnit.or || oUnit.wood)){
@@ -671,7 +734,7 @@ Game.prototype={
 					oUnit.or=0;
 					oUnit.wood=0;
 					
-					oUnit.buildNav();
+					//oUnit.buildNav();
 				
 				//si la cible c'est un arbre et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter < 8  && oUnit.cycleToX!=''){
@@ -691,7 +754,7 @@ Game.prototype={
 				}else if(aBuild && aBuild.name=='wood' && oUnit.counter >= 8 && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.wood=10;
-					oUnit.buildNav();
+					//oUnit.buildNav();
 					
 					//a chaque iteration on decremente la ressource
 					aBuild.ressource-=10;
@@ -746,7 +809,7 @@ Game.prototype={
 				}else if(aBuild && aBuild.name=='or' && oUnit.counter >= 8  && oUnit.cycleToX!=''){
 					//on indique à l'unité qu'elle transporte 10
 					oUnit.or=10;
-					oUnit.buildNav();
+					//oUnit.buildNav();
 					
 					oUnit.x=newX;
 					oUnit.y=newY;
@@ -758,7 +821,34 @@ Game.prototype={
 					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
                                         
                     oUnit.animate('walking');
+				
+				//si la cible c'est une mine d'or et que le compteur est inferieur à N
+				}else if(aBuild && aBuild.name=='Houblon' && oUnit.counter < 8  && oUnit.cycleToX!=''){
+                                    
+                    oUnit.animate('houblon');
+					//on met en place un compteur 
+					//pour que la ressources mette du temps
+					//a recuperer la ressource
+					oUnit.counter+=1;
 					
+					continue;
+				//si le compteur est superieur à N
+				}else if(aBuild && aBuild.name=='Houblon' && oUnit.counter >= 8  && oUnit.cycleToX!=''){
+					//on indique à l'unité qu'elle transporte 10
+					oUnit.houblon=10;
+					//oUnit.buildNav();
+					
+					oUnit.x=newX;
+					oUnit.y=newY;
+					
+					//on remet le compteur à 0
+					oUnit.counter=0;
+					
+					//on redéfinit la nouvelle cible (c'est un cycle)
+					oUnit.setTarget(oUnit.cycleFromX,oUnit.cycleFromY);
+                                        
+                    oUnit.animate('walking');
+				
 				}else if(this.checkCoord(newX,newY)){
 					//si la coordonnées est libre
 					oUnit.x=newX;
@@ -939,6 +1029,10 @@ Game.prototype={
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
 			sHtml+='<span style="border:2px solid #444;background:brown;padding:0px 4px">&nbsp;</span>';
 			sHtml+=' Bois: '+this.getRessource(this.team,'wood');
+			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
+			sHtml+='<span style="border:2px solid #444;background:orange;padding:0px 4px">&nbsp;</span>';
+			sHtml+=' Bierre: '+this.getRessource(this.team,'beer');
+			
 			
 			sHtml+=' <span style="padding:0px 10px">&nbsp;</span>';
 			

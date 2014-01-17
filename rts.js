@@ -5,13 +5,13 @@ var oGame;
 var oImages;
 var oSound;
 
-var widthCase=20;
-var heightCase=20;
+var widthCase=30;
+var heightCase=30;
 
 var currentX=0;
 var currentY=0;
 
-var maxX=800/widthCase;
+var maxX=900/widthCase;
 var maxY=600/heightCase;
 
 var QGx=10;
@@ -91,7 +91,7 @@ Images.prototype={
 
 function preload(){
 	
-        oSound=new Sound();
+    oSound=new Sound();
         
 	oImages=new Images();
 	
@@ -148,6 +148,7 @@ function preload(){
 			'unit-archer_walkingUp',
 			'unit-archer_walking2Up'
 		]
+		
 	];
 	for(var y=0;y<tDetailTmp.length;y++){
 		for(var x=0;x<tDetailTmp[y].length;x++){
@@ -160,7 +161,9 @@ function preload(){
 		['build-QG','build-QG_-2','build-QG_-1'],
 		['build-ArcherHouse','build-ArcherHouse_-2','build-ArcherHouse_-1'],
 		
-		['build-mineOr']
+		['build-mineOr'],
+		['case-houblon','case-houblon_-2','case-houblon_-1'],
+		['build-brasserie','build-brasserie_-2','build-brasserie_-1']
 	];
 	for(var y=0;y<tDetailTmp.length;y++){
 		for(var x=0;x<tDetailTmp[y].length;x++){
@@ -172,11 +175,11 @@ function preload(){
 	oImages.add('img3/sprite2x2.png','2x2');
 	
 	
-        oSound.add('img3/attack.mp3','attack');
-        oSound.add('img3/building.mp3','building');
-        oSound.add('img3/dead.mp3','dead');
-        oSound.add('img3/wood.mp3','wood');
-        oSound.add('img3/mining.mp3','mining');
+	oSound.add('img3/attack.mp3','attack');
+	oSound.add('img3/building.mp3','building');
+	oSound.add('img3/dead.mp3','dead');
+	oSound.add('img3/wood.mp3','wood');
+	oSound.add('img3/mining.mp3','mining');
 	
         
 	oImages.load();
@@ -265,6 +268,10 @@ function load(){
 	oUnit2.setTarget(14,7);
 	oUnit2.build();
 	oGame.tUnit.push(oUnit2);
+	
+	//ajout ressources pour l'enemie
+	oGame.tRessource['green']=Array();
+	oGame.tRessource['green']['beer']=1000;
 	
     //on créé le batiment de départ (QG)
 	var oBuild=new Build('QG','blue');

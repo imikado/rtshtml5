@@ -36,6 +36,8 @@ function Unit(name,team){
 	this.oAudio;
 	this.tmpIdImg='';
 	
+	this.costBeer=0;
+	
 	if(this.name=='Soldier'){
 		this.shortname='Soldat';
 		this.src='img3/unit-soldier.png';
@@ -44,6 +46,7 @@ function Unit(name,team){
 		this.attak=20;
 		
 		this.costOr=200;
+		this.costBeer=10;
 		
 	}else if(this.name=='Archer'){
 		this.shortname='Archer';
@@ -53,6 +56,7 @@ function Unit(name,team){
 		this.attak=30;	
 		
 		this.costOr=500;
+		this.costBeer=30;
 	}else if(this.name='Worker'){
 		this.shortname='Ouvrier';
 		this.src='img3/unit-worker.png';
@@ -61,13 +65,22 @@ function Unit(name,team){
 		this.attak=5;
 		
 		this.costOr=100;
+		this.costBeer=5;
 		
 		this.tBuildCreation.push(new Build('SoldierHouse',this.team));
 		this.tBuildCreation.push(new Build('ArcherHouse',this.team));
+		this.tBuildCreation.push(new Build('Houblon',this.team));
+		this.tBuildCreation.push(new Build('Brasserie',this.team));
 	}
 }
 Unit.prototype={
 	playSound:function(action,lastAction){
+		if(!oGame.bSound){
+			this.stopSound();
+			return;
+		}
+		
+		
 		if(action==lastAction){
 			return;
 		}
@@ -129,6 +142,9 @@ Unit.prototype={
 		}else if(action=='mining'){
 			tmpImg=this.idImg;
 			this.playSound('mining',this.action);
+		}else if(action=='houblon'){
+			tmpImg=this.idImg;
+			//this.playSound('mining',this.action);
 		}else if(action=='stand'){
 			tmpImg=this.idImg;
 		}
