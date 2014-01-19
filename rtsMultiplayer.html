@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>RTS</title>
+ 
+    <!-- meta -->
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+
+	<script src="http://localhost:1337/socket.io/socket.io.js"></script>
+	<script src="lib3/main.js"></script>    
+	<script src="lib3/canvas.js"></script>    
+	<script src="rtsMultiplayer.js"></script>
+	<script src="rts_Map.js"></script>
+	<script src="rts_Unit.js"></script>
+	<script src="rts_Build.js"></script>
+    <script src="rts_Sound.js"></script>
+    
+    <script src="rts_GameMultiplayer.js"></script>
+	<style>
+	body{
+		background:#000;
+	}
+	*{
+		font-family:arial;
+		font-size:11px;
+	}
+	#loading{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:900px;
+		height:800px;
+		background:#000000;
+		color:white;
+		text-align:center;
+		padding-top:400px;
+	}
+	#layer_map, #layer_building, #layer_perso, #layer_select, #layer_newbuild, #layer_brouillard, #layer_brouillard2,#layer_cadre, #layer_cursor{
+		position:absolute;
+		top:0px;
+		width:900px;
+		height:600px;
+	}
+	#layer_map{
+		background:url('img3/case-water.png');
+	}
+	#content{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:900px;
+		height:600px;
+                border-right:1px solid white;
+	}
+	#menu{
+		position:absolute;
+		width:900px;
+		top:600px;
+		left:0px;
+		height:20px;
+		background:black;
+		color:white;
+		padding-top:2px;
+		font-family:verdana;
+		font-weight:bold;
+                border-right:1px solid white;
+	}
+	#nav{
+		position:absolute;
+		top:620px;
+		left:0px;
+		width:880px;
+		height:244px;
+		background:#222;
+		padding:10px;
+                border-right:1px solid white;
+                border-bottom:1px solid white;
+	}
+	#nav h1{
+		color:white;
+		font-size:12px;
+		}
+	#nav h2{
+		color:white;
+		font-size:12px;
+		border-bottom:1px solid white;
+		}
+	#nav2{
+		position:absolute;
+		top:600px;
+		left:0px;
+		width:1200;
+		height:100px;
+		background:#000;
+		text-align:right;
+		
+	}
+	#layer_apercu,#layer_apercuCadre,#layer_apercuBuild,#layer_apercuBrouillard{
+		position:absolute;
+		top:622px;
+		left:700px;
+		border:1px solid white;
+	}
+	#layer_apercu{
+		background:url('img3/case-water.png');
+	}
+	.btnImage{
+		width:20px;
+		padding:4px;
+		background:white;
+		border:3px solid #ccc;
+	}
+	.btnImageOff{
+		width:20px;
+		padding:4px;
+		background:#970e0e;
+		border:3px solid #970e0e;
+	}
+	.curseur td{
+		padding:0px;
+		margin:0px;
+	}
+	.curseur input{
+		margin:0px;
+	}
+	#sound{
+		position:absolute;
+		top:830px;
+		left:700px;
+		color:white;
+	}
+	 
+	</style>
+	
+	</head>
+	<body onload="preload()" onkeydown="oGame.keydown(event)">
+
+		<div id="content" onmousemove="oGame.mousemove(event)" onmouseout="oGame.mouseout()" onclick="oGame.click(event)" oncontextmenu="return oGame.clickdroit(event)" >
+		<canvas id="layer_map" width="900" height="600"></canvas>
+		<canvas id="layer_building" width="900" height="600"></canvas>
+		<canvas id="layer_perso" width="900" height="600"></canvas>
+		<canvas id="layer_select" width="900" height="600"></canvas>
+		<canvas id="layer_cursor" width="900" height="600"></canvas>
+		
+		<canvas id="layer_brouillard" width="900" height="600"></canvas>
+		<canvas id="layer_brouillard2" width="900" height="600"></canvas>
+		<canvas id="layer_newbuild" width="900" height="600"></canvas>
+		
+		<canvas id="layer_cadre" width="900" height="600"></canvas>
+
+		</div>	
+		<div id="menu">Or: 100 </div>
+		<div id="nav"></div>
+
+		<div onclick="oGame.clickApercu(event)" oncontextmenu="return oGame.clickdroitApercu(event)">
+			<canvas id="layer_apercu" width="200" height="200"></canvas>
+			<canvas id="layer_apercuBuild" width="200" height="200"></canvas>
+			<canvas id="layer_apercuBrouillard" width="200" height="200"></canvas>
+			<canvas id="layer_apercuCadre" width="200" height="200"></canvas>
+		</div>
+
+		<div id="loading">Loading...</div>
+                
+        <div id="sound"><input checked="checked" type="checkbox" id="soundEnabled" onclick="oGame.switchSound(this)"> Son</div>
+
+	</body>
+</html>
