@@ -185,6 +185,8 @@ Game.prototype={
 		
 		console.log('setTeam : '+team);
 		oGame.buildRessource();
+		
+		refresh();
 	},
 	newGame:function(){
 		socket.send('newGame');

@@ -178,20 +178,7 @@ Unit.prototype={
 			oGame.createBuildBroadcast(oGame.team,this.oBuildOn.name,this.oBuildOn.x,this.oBuildOn.y);
 			
 			var aBuild=new Build(this.oBuildOn.name,this.team);
-			/*
-			//création du batiment à l'emplacement
-			var aBuild=new Build(this.oBuildOn.name,this.team);
-			aBuild.x=this.oBuildOn.x;
-			aBuild.y=this.oBuildOn.y;
-			aBuild.level=-2;
-			aBuild.sSprite='_'+aBuild.level;
-			aBuild.build();
 			
-			//ajout du batiment à la liste des batiments (pour la reconstruction lors des scroll)
-			oGame.tBuild.push(aBuild);
-			//on sauvegarde les coordonnées du batiments
-			oGame.saveBuild(aBuild);
-			*/
 			//on reset les propriétés de construction
 			oGame.buildcreation='';
 			this.buildOnX='';
