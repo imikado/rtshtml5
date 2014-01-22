@@ -183,6 +183,9 @@ function preload(){
 	oSound.add('img3/dead.mp3','dead');
 	oSound.add('img3/wood.mp3','wood');
 	oSound.add('img3/mining.mp3','mining');
+	oSound.add('img3/bierre.mp3','bierre');
+	
+	
 	
         
 	oImages.load();

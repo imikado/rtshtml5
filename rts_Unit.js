@@ -150,7 +150,7 @@ Unit.prototype={
 			this.playSound('mining',this.action);
 		}else if(action=='houblon'){
 			tmpImg=this.idImg;
-			//this.playSound('mining',this.action);
+			this.playSound('bierre',this.action);
 		}else if(action=='stand'){
 			tmpImg=this.idImg;
 		}
