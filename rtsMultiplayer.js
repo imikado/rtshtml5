@@ -239,7 +239,7 @@ function preload2(){
 		oGame.keyup(event);
 	};
 	
-	setTimeout(load,3000);
+	setTimeout(load,1000);
 }
 
 
@@ -272,9 +272,9 @@ function load(){
 	//on commencera la boucle de raffraichissement run() 
     //dans N secondes
     
-    if(oGame.team=='blue'){
-		setTimeout(run,fps);
-	}
+   // if(oGame.team=='blue'){
+	//	setTimeout(run,fps);
+	//}
 	
 }
 
@@ -299,7 +299,8 @@ function run(){
 	}
 	
 	iRefreshBuild++;
-		
+	
+	//console.log('run');	
 	
 	//dans N secondes on appelera de nouveau cette fonction 
 	setTimeout(run,fps);

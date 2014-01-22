@@ -122,6 +122,7 @@ Build.prototype={
 		}
 		
 		oImages.drawImageOnLayer(tmpImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase*2,widthCase*2,'building');
+		oLayer_building.fillRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),4,4,this.team);
 		
 		this.action=action;
 	},
@@ -132,7 +133,7 @@ Build.prototype={
 		
 		
 		oImages.drawImageOnLayer(this.idImg,(this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase*2,widthCase*2,'building');
-		
+		oLayer_building.fillRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),4,4,this.team);
 		 
 		oGame.saveBuild(this);
 		
@@ -202,14 +203,7 @@ Build.prototype={
 		oGame.useRessource(this.unitCreation.team,'or',this.unitCreation.costOr);
 		oGame.buildRessource();
 		
-		var oUnit;
-		oUnit =new Unit(this.unitCreation.name,this.team);
-		
-		oUnit.x=this.x+2;
-		oUnit.y=this.y;
-		oUnit.build();
-		
-		oGame.tUnit.push(oUnit);
+		oGame.createUnitBoadcast(this.team,this.unitCreation.name,this.x+2,this.y);
 		
 		oGame.displayVisibility();
 	}
@@ -283,6 +277,9 @@ Wood.prototype={
 		sDirection='refresh';
 
 		//console.log('ICI on supprime l arbre y:'+this.y+' x:'+this.x);
-	}
+	},
+	animate:function(){
+		
+	},
 };
 

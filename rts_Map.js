@@ -117,7 +117,7 @@ Map.prototype={
 						oWood.y=y2;
 						oWood.build();
 						
-						console.log('creation d un arbre y:'+y+' x:'+x);
+						//console.log('creation d un arbre y:'+y+' x:'+x);
 						
 						oGame.tBuild.push(oWood);
 					}

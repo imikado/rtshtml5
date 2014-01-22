@@ -822,7 +822,7 @@ Game.prototype={
                                         
                     oUnit.animate('walking');
 				
-				//si la cible c'est une mine d'or et que le compteur est inferieur à N
+				//si la cible c'est du houblon et que le compteur est inferieur à N
 				}else if(aBuild && aBuild.name=='Houblon' && oUnit.counter < 8  && oUnit.cycleToX!=''){
                                     
                     oUnit.animate('houblon');
@@ -834,9 +834,8 @@ Game.prototype={
 					continue;
 				//si le compteur est superieur à N
 				}else if(aBuild && aBuild.name=='Houblon' && oUnit.counter >= 8  && oUnit.cycleToX!=''){
-					//on indique à l'unité qu'elle transporte 10
-					oUnit.houblon=10;
-					//oUnit.buildNav();
+					//on indique à l'unité qu'elle transporte 1
+					oUnit.houblon=1;
 					
 					oUnit.x=newX;
 					oUnit.y=newY;

@@ -57,7 +57,7 @@ function Game(){
     socket.on('setTeam',function(team){
 		oGame.setTeam(team);
 	});
-	socket.on('createUnit',function(team,name,id,x,y){
+	socket.on('createUnit',function(id, team,name,x,y){
 		console.log('socket creation unit '+team+' '+name+' '+id+' '+x+' '+y);
 		var aUnit=new Unit(name,team);
 		aUnit.x=x;
@@ -83,6 +83,7 @@ function Game(){
 		oUnit.x=x;
 		oUnit.y=y;
 		oUnit.build();
+		console.log('local unit.build'+ id +' '+x+' '+y);
 	});
 	socket.on('unit.animate',function(id,action){
 		var oUnit=oGame.getUnitById(id);
@@ -98,7 +99,11 @@ function Game(){
 	});
 	socket.on('oBuild.animate',function(id,action){
 		var oBuild=oGame.getBuildById(id);
-		oBuild.animate(action);
+		if(oBuild){
+			oBuild.animate(action);
+		}else{
+			console.log('oBuild animate id non trouve '+id);
+		}
 	});
 	
 	socket.on('unit.setCycle',function(id,toX,toY,fromX,fromY,sObject){
@@ -132,6 +137,7 @@ function Game(){
 		var oBuild=oGame.getBuildById(id);
 		if(field=='level'){
 			oBuild.level=value;
+			console.log('obuild update ' + id+' '+field+'='+value);
 		}
 	});
 	
@@ -160,7 +166,28 @@ function Game(){
 Game.prototype={
 	setTeam:function(team){
 		this.team=team;
+		
+		//socket=io.connect('http://localhost:1337');
+		
+		if(team=='blue'){
+			setTimeout(run,fps);
+		}
+		
+		var tTeam=Array('blue','red','green','yellow');
+		for(var i=0;i<tTeam.length;i++){
+			var a = getById('button-'+tTeam[i]);
+			if(tTeam[i]==team){
+				a.className='buttonOn';
+			}else{
+				a.className='button';
+			}
+		}
+		
 		console.log('setTeam : '+team);
+		oGame.buildRessource();
+	},
+	newGame:function(){
+		socket.send('newGame');
 	},
 	setQG:function(team,x,y){
 		this.tQG[team]=Array();
@@ -187,6 +214,12 @@ Game.prototype={
 				return this.tBuild[i];
 			}
 		}
+	},
+	createBuildBroadcast:function(team,name,x,y){
+		socket.emit('oGame.createBuildBroadcast',team,name,x,y);
+	},
+	createUnitBoadcast:function(team,name,x,y){
+		socket.emit('oGame.createUnitBroadcast',team,name,x,y);
 	},
 	switchSound:function(object){
 		if(object.checked){
@@ -377,7 +410,7 @@ Game.prototype={
 		return true;
 	},
 	socketSetTarget:function(oUnit,x,y){
-		socket.emit('unit.setTarget',oUnit.id,x,y)
+		socket.emit('unit.setTargetBroadcast',oUnit.id,x,y)
 	},
 	goto:function(x,y){
 		//recuperation de batiment sur ces coordonnées
@@ -394,14 +427,9 @@ Game.prototype={
 			
 			for(var i=0;i<this.tSelected.length;i++){
 			
-				console.log('boucle sur selected '+i);
-			
 				//on indique que la destination de cycle c'est la mine d'or ou l'arbre
 				var cycleToX=x;
 				var cycleToY=y;
-
-				console.log('cycleFromX '+this.getQGx(this.team));
-				console.log('cycleFromY '+this.getQGy(this.team));
 
 				//on indique que la provenance du cycle c'est le QG
 				var cycleFromX=this.getQGx(this.team);
@@ -440,7 +468,7 @@ Game.prototype={
 				this.tSelected[i].setCycle(cycleToX,cycleToY,cycleFromX,cycleFromY,aBuild.name);
 
 				//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
-				this.tSelected[i].setTarget(cycleToX,cycleToY);
+				this.tSelected[i].setTargetBroadcast(cycleToX,cycleToY);
 			}	
 		}else if(this.tSelected.length && aBuild && ( aBuild.name=='QG' )){	
 			
@@ -448,7 +476,7 @@ Game.prototype={
 				//si une des unités séléctionné transporte une ressource
 				if(this.tSelected[i].or || this.tSelected[i].wood){
 					//on donne comme cible de deplacement la mine d'or/l'arbre cliqué
-					this.tSelected[i].setTarget(aBuild.x,aBuild.y);
+					this.tSelected[i].setTargetBroadcast(aBuild.x,aBuild.y);
 				}
 
 			}
@@ -457,10 +485,8 @@ Game.prototype={
 			for(var i=0;i <this.tSelected.length;i++){
 				this.tSelected[i].clearCycle();
 				//si la case est accessible, on y indique à l'unité d'y aller
-				if(this.tSelected[i].team==this.team){
-					this.socketSetTarget(this.tSelected[i],x,y)
-				}
-				this.tSelected[i].setTarget(x,y);
+				 
+				this.tSelected[i].setTargetBroadcast(x,y);
 			}
 		}
 	},
@@ -699,7 +725,7 @@ Game.prototype={
 		oMix.buildNav();
 	},
 	drawSelectedBroadcast:function(){
-		socket.emit('this.drawSelected');
+		socket.emit('this.drawSelectedBroadcast');
 	},
 	drawSelected:function(){
 		//on dessine le mouseover
@@ -755,10 +781,13 @@ Game.prototype={
 		for(var i=0;i< this.tBuild.length;i++){
 			var oBuild= this.tBuild[i];
 			
-			if(oBuild.level < 0){
-                            
+			if(oBuild.name=='or'){
+				oBuild.animateBroadcast('normal');
+			}else if(oBuild.level < 0){
+                //oBuild.updateBroadcast('level',oBuild.level+1);	  
                 oBuild.animateBroadcast('building');
-                oBuild.updateBroadcast('level',oBuild.level+1);	    
+                  
+                //console.log('update broadcast: level='+(oBuild.level+1));
                            
 			}else if(oBuild.name!='wood'){
 				oBuild.animateBroadcast('normal');
@@ -1163,14 +1192,14 @@ Game.prototype={
 		
 	},
 	addRessourceBroadcast:function(team,ressource,nb){
-		socket.emet('this.addRessource',team,ressource,nb);
+		socket.emit('this.addRessourceBroadcast',team,ressource,nb);
 	},
 	addRessource:function(team,ressource,nb){
 		this.tRessource[team][ressource]+=nb;
 		this.buildRessource();
 	},
 	useRessourceBroadcast:function(team,ressource,nb){
-		socket.emet('this.useRessource',team,ressource,nb);
+		socket.emit('this.useRessourceBroadcast',team,ressource,nb);
 	},
 	useRessource:function(team,ressource,nb){
 		this.tRessource[team][ressource]-=nb;
@@ -1187,6 +1216,7 @@ Game.prototype={
 		this.onMouseOver=0;
 	},
 	buildRessource:function(){
+		console.log('buildRessource');
 		var a=getById('menu');
 		if(a && this.team!=''){
 			var sHtml='';

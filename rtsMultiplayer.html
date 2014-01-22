@@ -14,8 +14,8 @@
 	<script src="lib3/canvas.js"></script>    
 	<script src="rtsMultiplayer.js"></script>
 	<script src="rts_Map.js"></script>
-	<script src="rts_Unit.js"></script>
-	<script src="rts_Build.js"></script>
+	<script src="rts_UnitMultiplayer.js"></script>
+	<script src="rts_BuildMultiplayer.js"></script>
     <script src="rts_Sound.js"></script>
     
     <script src="rts_GameMultiplayer.js"></script>
@@ -132,7 +132,24 @@
 		left:700px;
 		color:white;
 	}
-	 
+	#team{
+		position:absolute;
+		top:0px;
+		left:900px;
+		
+	}
+	.button,.buttonOn{
+		display:block;
+		margin-bottom:10px;
+		border:2px solid gray;
+		background:#eee;
+		color:black;
+		padding:4px;
+	}
+	.buttonOn{
+		background:darkblue;
+		color:white;
+	}
 	</style>
 	
 	</head>
@@ -166,5 +183,17 @@
                 
         <div id="sound"><input checked="checked" type="checkbox" id="soundEnabled" onclick="oGame.switchSound(this)"> Son</div>
 
+
+		<div id="team">
+			<a id="button-blue" class="button" onclick="oGame.setTeam('blue')" href="#blue">Blue</a>
+			<br />
+			<a id="button-red" class="button" onclick="oGame.setTeam('red')" href="#red">Red</a>
+			<br />
+			<a id="button-green" class="button" onclick="oGame.setTeam('green')" href="#green">Green</a>
+			<br />
+			<a id="button-yellow" class="button" onclick="oGame.setTeam('yellow')" href="#yellow">Yellow</a>
+			
+			
+		</div>
 	</body>
 </html>

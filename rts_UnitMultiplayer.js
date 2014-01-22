@@ -157,6 +157,8 @@ Unit.prototype={
 		
 		oImages.drawImageOnLayer(tmpImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
 		
+		oLayer_perso.fillRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),4,4,this.team);
+		
 		this.action=action;
 	},
 	//broadcast
@@ -168,9 +170,15 @@ Unit.prototype={
 		//partie affichage de l'image de l'unité sur le canvas
 		oImages.drawImageOnLayer(this.idImg,((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2,'perso');
 		
+		oLayer_perso.fillRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),4,4,this.team);
+		
 		//si l'unité doit construire un batiment, et qu'elle se trouve sur les lieux de la construction
 		if(this.oBuildOn && this.getX()+1==this.oBuildOn.x && this.getY()==this.oBuildOn.y){
 			
+			oGame.createBuildBroadcast(oGame.team,this.oBuildOn.name,this.oBuildOn.x,this.oBuildOn.y);
+			
+			var aBuild=new Build(this.oBuildOn.name,this.team);
+			/*
 			//création du batiment à l'emplacement
 			var aBuild=new Build(this.oBuildOn.name,this.team);
 			aBuild.x=this.oBuildOn.x;
@@ -183,7 +191,7 @@ Unit.prototype={
 			oGame.tBuild.push(aBuild);
 			//on sauvegarde les coordonnées du batiments
 			oGame.saveBuild(aBuild);
-			
+			*/
 			//on reset les propriétés de construction
 			oGame.buildcreation='';
 			this.buildOnX='';
@@ -214,7 +222,7 @@ Unit.prototype={
 	mask:function(){
 		oLayer_perso.clearRect((this.x-currentX)*widthCase,(this.y-currentY)*heightCase,widthCase,heightCase);
 	},
-	setCycleBroadcast:function(id,toX,toY,fromX,fromY,sObject){
+	setCycleBroadcast:function(toX,toY,fromX,fromY,sObject){
 		socket.emit('oUnit.setCycleBroadcast',this.id,toX,toY,fromX,fromY,sObject)
 	},
 	setCycle:function(toX,toY,fromX,fromY,sObject){
@@ -246,8 +254,8 @@ Unit.prototype={
 							(this.y-currentY-2)*widthCase,widthCase*5,widthCase*5);
 		//console.log('clearObscu');
 	},
-	setTargetBroadcast:function(id,x,y){
-		socket.emit('oUnit.setTargetBroadcast',this.id,x,y)
+	setTargetBroadcast:function(x,y){
+		socket.emit('unit.setTargetBroadcast',this.id,x,y)
 	},
 	setTarget:function(x,y){
 		this.targetX=x;
